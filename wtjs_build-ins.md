@@ -49,7 +49,7 @@ a cross environment (node.js, browser, web worker...) way of accessing the globa
 
 ### uneval()
 
-### isFinite() & Number.isNaN()
+### isFinite() & Number.isFinite()
 #ES2015
 
 ```js
