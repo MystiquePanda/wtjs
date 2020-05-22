@@ -13,31 +13,13 @@ Infinity === Number.NEGATIVE_INFINITY
 ### NaN
 
 ```js
-Number('one')
-> NaN
-
-isNaN(NaN)
-> true
-
-isNaN(Number.NaN)
-> true
-
 NaN === Number.NaN
 > false
 
-isNaN(Number('one'))
-> true
-
-Number.isNaN(Number('one'))
-> true
-
-isNaN('one')
-> true
-
-Number.isNaN('one')
+NaN === NaN
 > false
 ```
-in order for Number.isNaN to return true, 
+The only value in javascript that does not equal to itself
 
 ### undefined
 one of the six primitives
@@ -67,16 +49,45 @@ a cross environment (node.js, browser, web worker...) way of accessing the globa
 
 ### uneval()
 
-### isFinite()
+### isFinite() & Number.isNaN()
+#ES2015
 
 ```js
 Number.isFinite === globalThis.isFinite
 > false
-Number.isFinite
+
+Number.isFinite('0')
+> false
+
+isFinite('0')
+> true
 ```
-### isNaN()
-see 
-[NaN]:( /#nan)
+Number.isFinite to returns false for all the typeof input !== 'Number'
+
+
+### isNaN() & Number.isNaN()
+#ES2015
+
+```js
+isNaN(Number('one'))
+> true
+
+Number.isNaN(Number('one'))
+> true
+
+isNaN('one')
+> true
+
+Number.isNaN('one')
+> false
+
+isNaN(undefined)
+> true
+
+Number.isNaN(undefined)
+> false
+```
+Number.isNaN returns false for all the typeof input !== 'Number'
 
 ### parseFloat()
 
