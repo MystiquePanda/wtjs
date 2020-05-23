@@ -101,15 +101,138 @@ Number.isNaN returns false for all the typeof input !== 'Number'
 
 ### parseFloat()
 
+```js
+Number.parseFloat === parseFloat
+> true
+
+parseFloat("3.14andmore")
+> 3.14
+
+parseFloat(3.3333333333333333333333333333333)
+> 3.3333333333333335
+
+parseFloat("infinity")
+> NaN
+
+parseFloat("Infinity")
+> Infinity
+
+parseFloat("-0")
+> -0
+
+typeof parseFloat("9999n")
+> "number"
+```
+
+non-primitive objects can be parsed as well as long as Symbol.toPrimitive, toString, valueOf (in this order) is defined to return parsable String or Number. 
+
+```js
+parseFloat({ toString: function() { return "3.14" } })
+> 3.14
+
+let o={toString: function() { return "3.14" } }
+o[Symbol.toPrimitive]=function(){return 10}
+parseFloat(o)
+> 10
+
+parseFloat({valueOf:function(){return 10}})
+> NaN
+
+parseFloat({valueOf:function(){return 10}, toString:undefined})
+> 10
+
+parseFloat(Symbol(3.14))
+> VM1177:1 Uncaught TypeError: Cannot convert a Symbol value to a string
+
+parseFloat({valueOf:undefined, toString:undefined})
+VM4867:1 Uncaught TypeError: Cannot convert object to primitive value
+```
+
+
 ### parseInt()
 
-### decodeURI()
+```js
+parseInt === Number.parseInt
+> true
 
-### decodeURIComponent()
+parseInt("-0X10")
+> -16
+
+parseInt(1,36)
+> 1
+
+parseInt(1,37)
+> NaN
+
+parseInt(3,2)
+> NaN
+
+parseInt(Number.MAX_SAFE_INTEGER)
+> 9007199254740991
+
+parseInt(Number.MAX_VALUE)
+> 1
+
+```
+when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply (see parseFloat)
 
 ### encodeURI()
 
+UTF-8 encoding
+
+```js
+encodeURI("A-Za-z0-9;,/?:@&=+$-_.!~*()#'")
+> "A-Za-z0-9;,/?:@&=+$-_.!~*()#'"
+```
+when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply (see parseFloat)
+
 ### encodeURIComponent()
+
+UTF-8 encoding
+
+```js
+encodeURIComponent("A-Za-z0-9;,/?:@&=+$-_.!~*()#'")
+> "A-Za-z0-9%3B%2C%2F%3F%3A%40%26%3D%2B%24-_.!~*()%23'"
+```
+when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply (see parseFloat)
+
+### decodeURI()
+
+```js
+decodeURI("%A4")
+> VM2183:1 Uncaught URIError: URI malformed
+
+decodeURI(encodeURIComponent("?"))
+> "%3F"
+```
+when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply (see parseFloat)
+
+### decodeURIComponent()
+
+utility function for decoding query param
+
+```js
+function decodeQueryParam(p) {
+  return decodeURIComponent(p.replace(/\+/g, ' '));
+}
+
+decodeURIComponent('search+query%20%28correct%29')
+> "search+query (correct)"
+
+decodeQueryParam('search+query%20%28correct%29');
+
+> "search query (correct)"
+```
+
+when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply (see parseFloat)
 
 
 ## Fundamental objects
+
+### Object
+
+### Function
+
+### Symbol
+
+### Boolean
