@@ -40,12 +40,22 @@ undefined === globalThis.undefined
 
 ### globalThis
 a cross environment (node.js, browser, web worker...) way of accessing the global context. 
-** NOT supported by IE **
+**NOT supported by IE**
 
 
 ## Function properties
 
 ### eval()
+**eval() is dangerous and slow - it invokes JS interpreter, DO NOT USE**
+instead create a Function.
+
+```js
+let val="{c:new Date()}"
+eval(val)
+> {c: Fri May 22 2020 18:09:55 GMT-0400 (Eastern Daylight Time)}
+Function("return "+val)()
+> {c: Fri May 22 2020 18:09:55 GMT-0400 (Eastern Daylight Time)}
+```
 
 ### uneval()
 
