@@ -116,11 +116,74 @@ arr
 > [0, 1, 2, 3]
 ```
 
+### (Tagged) String Literals
+
+```js
+`\`` === '`'
+> true
+`${{valueOf:()=>(3),toString:()=>(2)}[Symbol.toPrimitive]=1}`
+> "1"
+
+String.raw(`print\nraw`)
+> VM9745:1 Uncaught TypeError: Cannot convert undefined or null to object
+String.raw`print\nraw\n${new Date()}`
+> "print\nraw\nMon May 25 2020 18:15:01 GMT-0400 (Eastern Daylight Time)"
+String.raw({raw: [1, 2, Number(3)]}, ' one ', {toString:()=>(' two ')},' three ')
+"1 one 2 two 3"
+
+let tagged=(str, ...keys)=>{
+console.log("str: ",str);
+console.log("keys: ",keys); 
+console.log("raw: ",String.raw(str))}
+tagged`tagged template ${{complex:true}} \n \u00A9${Number(4)}` //#ES2016
+> str:  ["tagged template ", " ↵ ©", "", raw: Array(3)]
+> keys: [{complex:true}, 4]
+> raw:  tagged template  \n \u00A9
+```
+
+Usecase for tagged string literal
+```js
+function highlight(strings, ...values) {
+     // here i is the iterator for the strings array
+     return strings.reduce((result, string, i) => {
+      return `${result}${string} <cite>${values[i] || ''}</cite>`;
+    }, '');
+}
+
+const author = 'Thomas A. Edison';
+const statement = `I have not failed. I've just found 10,000 ways that won't work.`;
+highlight`${statement} by ${author}`;
+> " <cite>I have not failed. I've just found 10,000 ways that won't work.</cite> by  <cite>Thomas A. Edison</cite> <cite></cite>"
+```
+[https://codeburst.io/javascript-es6-tagged-template-literals-a45c26e54761]
+
+
+### String features
+
+```js
+"Some New methods".startsWith("Methods", 9)
+> false
+
+"Some New methods".startsWith("Methods".toLowerCase(), 9)
+> true
+
+"Some New methods".endsWith("ew ", 9)
+> true
+"Some New methods".includes("Some", 5)
+> false
+
+"Loop".repeat(-2)
+> VM119261:1 Uncaught RangeError: Invalid count value
+"Loop".repeat(0)
+> ""
+
+
+String.fromCodePoint(9731 /*HTML Entity*/, 0x0001D49F /*UTF-32*/)
+> "☃𝒟"
+
+```
+
 ### Class & Inheritance
-
-### Template string
-
-### String feature
 
 ### Math & Number feature
 
@@ -134,4 +197,3 @@ arr
 
 ### Arrow function
 
-### 
