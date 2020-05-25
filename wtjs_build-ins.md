@@ -231,6 +231,21 @@ when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply
 
 ### Object
 
+Object constructor rules
+1. new Object(null|undefined) => empty object
+2. return object of a given type
+3. if the value is an object, it will return the value
+
+```js
+let x = {random: true}
+let y = new Object(x)
+y.random = false;
+x.random
+> false
+```
+
+
+
 ### Function
 
 ### Symbol
