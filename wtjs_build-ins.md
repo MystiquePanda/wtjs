@@ -243,6 +243,52 @@ y.random = false;
 x.random
 > false
 ```
+#### Static Methods
+
+- Property definition
+```js
+let objVal = 'value';
+Object.defineProperty(obj,'objName',
+{
+get() { return objVal; },
+set(newVal) { objVal = newVal; },
+configurable:true,
+writable:true,enurable:true})
+
+Object.defineProperties()
+```
+
+| meta | Data Property | Accessor Property | |
+| --- | --- | --- | --- |
+|enurable| x | x | appear in Object.keys when true|
+|configurable| x | x | can change meta after creation | 
+|writable| x | | Changable after creation | 
+
+
+- Object Immutability
+
+|                   | Object.freeze | Object.seal | Object.preventExtention|
+| ---               | --- | --- | --- |
+| add properties    | NO            | NO          | NO                     |
+| delete property   | NO            | NO          | YES                    |
+| writable          | false         | unchanged   | unchanged              |
+| configurable.     | false         | false       | unchanged              | 
+| checking method   | isFrozen()    | isSealed()  | isExtensible()         | 
+
+All three state are **irriversible** and set **shallowly**
+
+```js
+function deepFreeze(object) {
+  Object.getOwnPropertyNames(object).forEach(name => {
+    var prop = object[name];
+    
+    if (prop && typeof prop === 'object')
+      deepFreeze(prop);
+  });
+  
+  return Object.freeze(object);
+}
+```
 
 
 
