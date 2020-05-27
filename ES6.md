@@ -57,7 +57,7 @@ oa
 >["one";"dos"]
 
 let o = {random:true};
-o.__proto__.hidden=":)";
+Object.setPrototypeOf(o,{hidden:":)"});
 let {random:r,hidden,missing} = o;
 missing
 > undefined
