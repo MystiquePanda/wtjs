@@ -191,6 +191,33 @@ String.fromCodePoint(9731 /*HTML Entity*/, 0x0001D49F /*UTF-32*/)
 
 ### Generators
 
+```js
+let generator = function* () { 
+  yield 1;
+  yield "two";
+  yield 3n;
+}
+let g = generator();
+[g.next(),g.next(),g.next(),g.next()]
+> [{value: 1, done: false};{value: "two", done: false};{value: 3n, done: false};{value: undefined, done: true}]
+g.return()
+{value: undefined, done: true}
+
+function* fibonacci() {
+    let f = [];
+    let i = 0;
+    while (true) {
+        if(i < 2){f.push(i)}
+        else {f.push(f[i-1]+f[i-2])}
+        i++;
+        yield f[f.length-1]
+    }
+}
+for (let i =0; i < 5; i++) {f.next()}
+> {value: 3, done: false}
+f.return()
+> {value: undefined, done: true}
+```
 ### Iterators
 
 ### Async and Promises
