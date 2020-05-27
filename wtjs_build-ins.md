@@ -309,6 +309,24 @@ m.val = 'second';
 m.val
 > 0: {val: "first"}
 > 1: {val: "second"}
+
+function o() {}
+Object.defineProperty(o.prototype, "protoprop", {
+  get() {
+    return this.prop;
+  },
+  set(x) {
+    this.prop = x;
+  }
+});
+var a = new o();
+a.protoprop = 1;
+a
+> o {prop: 1}
+> prop: 1
+> __proto__:
+>   protoprop: 1
+
 ```
 
 ```js
@@ -328,6 +346,28 @@ Object.getOwnPropertyDescriptor("noError",2)
 > {value: "E", writable: false, enumerable: true, configurable: false}
 Object.getOwnPropertyDescriptor(Symbol.for('noError'),0)
 > undefined
+```
+
+*Shallow* copy of all *enumerable data properties* can be done using Object.assign().
+```js
+let s1 = {[Symbol("s")]:"special","s":"normal","one":true}
+let s2 = {[Symbol("s")]:"special2","s":"normal2","two":true}
+let t = {"three":true}
+Object.assign(t, s1, s2)
+{three: true, s: "normal2", one: true, two: true, Symbol(s): "special", Symbol(s): "special2"}
+
+
+Object.assign({},"string",true,10,10n,true,undefined,null,Infinity,NaN)
+> {0: "s", 1: "t", 2: "r", 3: "i", 4: "n", 5: "g"}
+
+const b = Object.defineProperty({},"bomb",{value:"hidden",writable: false})
+
+
+const b = Object.defineProperty({},"bomb",{value:"hidden",writable: false})
+Object.assign(b, { a: 0 }, { b: 1, bomb: "kaboom", c: 2 }, { d: 3 });
+> VM1165:1 Uncaught TypeError: Cannot assign to read only property 
+b
+{a: 0, b: 1, bomb: "hidden"}
 ```
 
 - Object Immutability
@@ -413,10 +453,49 @@ Object.getPrototypeOf(3);
 Object.getPrototypeOf(undefined);
 > VM6961:1 Uncaught TypeError: Cannot convert undefined or null to object
 
-
-
 ```
 
+
+```js
+Object.appendChain = function(oChain, oProto) {
+  if (arguments.length < 2) { 
+    throw new TypeError('Object.appendChain - Not enough arguments');
+  }
+  if (typeof oProto !== 'object' && typeof oProto !== 'string') {
+    throw new TypeError('second argument to Object.appendChain must be an object or a string');
+  }
+
+  let oNewProto = oProto,
+      oReturn = o2nd = oLast = oChain instanceof this ? oChain : new oChain.constructor(oChain);
+
+  for (let o1st = this.getPrototypeOf(o2nd);
+    o1st !== Object.prototype && o1st !== Function.prototype;
+    o1st = this.getPrototypeOf(o2nd)
+  ) {
+    o2nd = o1st;
+  }
+
+  if (oProto.constructor === String) {
+    oNewProto = Function.prototype;
+    oReturn = Function.apply(null, Array.prototype.slice.call(arguments, 1));
+    this.setPrototypeOf(oReturn, oLast);
+  }
+
+  this.setPrototypeOf(o2nd, oNewProto);
+  return oReturn;
+}
+
+let p = 17;
+let np =Object.appendChain(p, MySymbol={
+  isPrime:true
+});
+[typeof p, typeof np]
+> (2) ["number", "object"]
+```
+
+#### Instance properties
+
+#### Instance methods
 
 
 ### Function
