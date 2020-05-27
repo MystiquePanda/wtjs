@@ -231,6 +231,8 @@ when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply
 
 ### Object
 
+#### Object Creation
+
 Object constructor rules
 1. new Object(null|undefined) => empty object
 2. return object of a given type
@@ -242,7 +244,24 @@ let y = new Object(x)
 y.random = false;
 x.random
 > false
+
+let oempty = Object.create({});
+let onull = Object.create(null);
+let oundefined = Object.create(undefined);
+> VM56748:1 Uncaught TypeError: Object prototype may only be an Object or null: undefined
+oempty.toString()
+> "[object Object]"
+onull.toString()
+> VM56604:1 Uncaught TypeError: y.toString is not a function
+
+onull = Object.create( null );                  // create "null" object (same as before)
+Object.setPrototypeOf(onull, Object.prototype); 
+
+const source = { a: 1, b: 2, c: 3 };
+let target = Object.fromEntries(Object.entries(x).map(([ key, val ]) => [ key, val * 2 ])
+);
 ```
+
 #### Static Methods
 
 - Property definition
@@ -288,6 +307,67 @@ function deepFreeze(object) {
   
   return Object.freeze(object);
 }
+```
+- Inspection
+
+```js
+let x = {}
+Object.defineProperties(x,{
+  visible:{value:true, enumerable: true}, 
+  hidden:{value: false, enurable: false}});
+Object.defineProperty(o, Symbol.for('special'), {
+  value: Infinity, enumerable: true});
+
+Object.keys(x)
+> ["visible"]
+Object.values(x)
+> [true]
+Object.entries(x)
+> [Array(2)]
+>  0: (2) ["visible", true]
+
+Object.getOwnPropertyNames(x)
+> (2) ["visible", "hidden"]
+Object.getOwnPropertySymbols(x)
+> [Symbol(special)]
+```
+- value-comparison
+#ES2015
+```js
+0 === -0
+> true
+Object.is(0,-0)
+> false
+
+Number.Nan === Number.NaN
+> false
+Object.is(Number.NaN, Number.NaN)
+> true
+
+```
+
+- Prototype manipulations
+
+```js
+let o = Object.create(null)
+Object.getPrototypeOf(o)
+> null
+
+const proto = {random:true};
+const o = Object.create(proto);
+console.log(Object.getPrototypeOf(o) === proto);
+> true
+
+// #ES2015 Non-object types get coerced into object
+Object.getPrototypeOf(Symbol.for("special"));
+> Symbol {Symbol(Symbol.toStringTag): "Symbol", constructor: ƒ, toString: ƒ, valueOf: ƒ, …}
+Object.getPrototypeOf(3);
+> Number {0, constructor: ƒ, toExponential: ƒ, toFixed: ƒ, toPrecision: ƒ, …}
+Object.getPrototypeOf(undefined);
+> VM6961:1 Uncaught TypeError: Cannot convert undefined or null to object
+
+
+
 ```
 
 
