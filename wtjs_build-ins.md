@@ -265,6 +265,13 @@ let target = Object.fromEntries(Object.entries(x).map(([ key, val ]) => [ key, v
 #### Static Methods
 
 - Property definition
+
+| meta | Data Property | Accessor Property | |
+| --- | --- | --- | --- |
+|enurable| x | x | appear in Object.keys when true|
+|configurable| x | x | can change meta after creation | 
+|writable| x | | Changable after creation | 
+
 ```js
 let objVal = 'value';
 Object.defineProperty(obj,'objName',
@@ -277,12 +284,24 @@ writable:true,enurable:true})
 Object.defineProperties()
 ```
 
-| meta | Data Property | Accessor Property | |
-| --- | --- | --- | --- |
-|enurable| x | x | appear in Object.keys when true|
-|configurable| x | x | can change meta after creation | 
-|writable| x | | Changable after creation | 
+```js
+let o = { [Symbol.for('prime')]: 13,  "even":2}
+Object.getOwnPropertyDescriptor(o,Symbol.for('prime')); 
+> {value: 13, writable: true, enumerable: true, configurable: true}
+Object.getOwnPropertyDescriptor(o,"even"); 
+> {value: 2, writable: true, enumerable: true, configurable: true}
+Object.getOwnPropertyDescriptor(o,"notthere"); 
+> undefined
+Object.getOwnPropertyDescriptors(o); 
+> even: {value: 2, writable: true, enumerable: true, configurable: true}
+> Symbol(prime): {value: 13, writable: true, enumerable: true, configurable: true}
 
+//#ES2015, a non-object  will be coerced to an object.
+Object.getOwnPropertyDescriptor("noError",2)
+> {value: "E", writable: false, enumerable: true, configurable: false}
+Object.getOwnPropertyDescriptor(Symbol.for('noError'),0)
+> undefined
+```
 
 - Object Immutability
 
@@ -332,7 +351,7 @@ Object.getOwnPropertySymbols(x)
 > [Symbol(special)]
 ```
 - value-comparison
-#ES2015
+ #ES2015
 ```js
 0 === -0
 > true
