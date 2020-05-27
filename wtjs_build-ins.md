@@ -32,7 +32,7 @@ undefined === globalThis.undefined
 |                          | var x; | var x=null; | undeclared ||
 | --- | --- | --- | --- | --- |
 | x === undefined          | true   | false|Reference Error||
-| x == undfined            | true   | true |Reference Error||
+| x == undefined            | true   | true |Reference Error||
 | typeof x === "undefined" | true   | false|true| preferred way|
 | "x" in globalThis          | true   | true|false|when x is bound to global object|
 | x === void 0             | true   | false|Reference Error|void evaluate expression and return undefined|
@@ -266,22 +266,49 @@ let target = Object.fromEntries(Object.entries(x).map(([ key, val ]) => [ key, v
 
 - Property definition
 
-| meta | Data Property | Accessor Property | |
+|| optional keys | default |  |
 | --- | --- | --- | --- |
-|enurable| x | x | appear in Object.keys when true|
-|configurable| x | x | can change meta after creation | 
-|writable| x | | Changable after creation | 
+||enurable| false | appear in Object.keys() when true and property name is String|  |
+||configurable| false | if property can be deleted or options can be modified |  | 
+|data descriptor| writable | false | if value is modifiable after creation | 
+|data descriptor| value | undefined |  | 
+|accessor descriptor| get | undefined |  | 
+|accessor descriptor| set | undefined |  | 
 
 ```js
-let objVal = 'value';
-Object.defineProperty(obj,'objName',
-{
-get() { return objVal; },
-set(newVal) { objVal = newVal; },
-configurable:true,
-writable:true,enurable:true})
+let o = {};
+Object.defineProperty(o,"tobedel",{value:null, configurable: false, enumerable: true});
+delete o.tobedel;
+o.tobedel;
+> null
+"use strict"; delete o.tobedel
+> VM1126:1 Uncaught TypeError: Cannot delete property
 
-Object.defineProperties()
+Object.defineProperty(o, Symbol.for("strange"),{value: true, enumerable: true});
+Object.keys(o);
+> ["tobedel"]
+
+
+function memory() {
+  let l = null;
+  let r = [];
+
+  Object.defineProperty(this, 'val', {
+    get() {
+      return r;
+    },
+    set(value) {
+      l = value;
+      r.push({ val: l });
+    }
+  });
+}
+let m = new memory();
+m.val = 'first';
+m.val = 'second';
+m.val
+> 0: {val: "first"}
+> 1: {val: "second"}
 ```
 
 ```js
@@ -327,6 +354,7 @@ function deepFreeze(object) {
   return Object.freeze(object);
 }
 ```
+
 - Inspection
 
 ```js
