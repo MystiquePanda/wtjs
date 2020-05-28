@@ -192,32 +192,92 @@ String.fromCodePoint(9731 /*HTML Entity*/, 0x0001D49F /*UTF-32*/)
 ### Generators
 
 ```js
+
 let generator = function* () { 
   yield 1;
   yield "two";
   yield 3n;
+  return false;
 }
 let g = generator();
-[g.next(),g.next(),g.next(),g.next()]
+[g.next(),g.next(),g.next()]
 > [{value: 1, done: false};{value: "two", done: false};{value: 3n, done: false};{value: undefined, done: true}]
 g.return()
-{value: undefined, done: true}
+> {value: false, done: true}
 
 function* fibonacci() {
-    let f = [];
-    let i = 0;
-    while (true) {
-        if(i < 2){f.push(i)}
-        else {f.push(f[i-1]+f[i-2])}
-        i++;
-        yield f[f.length-1]
-    }
+  const f = [];
+  const base = function*() {
+    yield f.push(0)-1;  
+    yield f.push(1)-1;
+  };
+      
+  yield* base();
+  while (true) {
+    const {length:l} = f;
+    f.push(f[l-2]+f[l-1])
+    yield f[l];
+  }
 }
-for (let i =0; i < 5; i++) {f.next()}
+let f = fibonacci();
+for (let i =0; i < 5; i++) {console.log(f.next().value)}
 > {value: 3, done: false}
-f.return()
+g.return()
 > {value: undefined, done: true}
+
+function* fibonacci() {
+  let f = [0,1];
+  yield* f;
+  while (true) {
+    const {length:l} = f;
+    f.push(f[l-2]+f[l-1]);
+    yield f[l];
+  }
+}
+
+function* gen(){
+  let inner = function*() {
+    yield* [1,2];
+    return "inner done";
+  }
+  yield* (yield* inner());
+  return "done";
+}
+let g = gen();
+for (let i =0; i < 20; i++) {console.log(g.next())}
+
+
+function withConstructor(){
+  const arr = [1,2];
+  const con = Object.getPrototypeOf(function*(){}).constructor;
+  const g = new con('yield* arr');
+  const iterator = g();
+  let i;
+  do{
+    i = iterator.next(); 
+    console.log(`from generator ${i.value}`)
+  }while(!i.done); 
+}
+withConstructor()
+> Uncaught ReferenceError: arr is not defined
+
+function asGenerator(){
+const arr = [1,2];
+const Generator = function*(){yield* arr}
+const iterator = Generator();
+let i = true;
+  do{
+    i = iterator.next(); 
+    console.log(`from generator ${i.value}`)
+  }while(!i.done); 
+}
+asGenerator()
+> from generator 1
+> from generator 2
+> from generator undefined
+
 ```
+
 ### Iterators
 
 ### Async and Promises
