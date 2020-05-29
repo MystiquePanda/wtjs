@@ -408,6 +408,13 @@ Math.clz32(0b01000000000000000000000000000000)
 
 ### Arrow function
 
+```js
+let f = ([a, b] = [1, 2], {x: c} = {x: a + b}) => ({a:a,b:b,c:c});
+f()
+> {a: 1, b: 2, c: 3}
+
+
+```
 ### new data structures
 
 ### Class & Inheritance
