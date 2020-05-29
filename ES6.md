@@ -284,6 +284,8 @@ asGenerator()
 | Iterable | [Symbol.iterator] | A zero-argument function that returns an 'Iterator' object|
 | Iterator | next() | a zero-argument function that return {value:,done:boolean}|
 
+A generator object is both *iterator* and *iterable*
+
 ```js
 let weekdays = new String("monday to friday");
 weekdays[Symbol.iterator] = function* () {
@@ -293,6 +295,31 @@ weekdays[Symbol.iterator] = function* () {
 > (5) ["m", "t", "w", "th", "f"]
 weekdays+""
 > "monday to friday"
+
+weekdays[Symbol.iterator] = function () {
+  return {
+    next: function () {
+      return this._first ? {
+        value: 'no weekend',
+        done: (this._first = false)
+      } : {
+        done: true
+      }
+    },
+    _first: true
+  };
+};
+[...weekdays]
+> ["no weekend"]
+
+/#ES2015 class syntax
+class WeekClass {
+  *[Symbol.iterator]() {
+    yield* ['m','t','w','th','f'] 
+  }
+}
+[...new WeekClass()]
+> (5) ["m", "t", "w", "th", "f"]
 ```
 
 
