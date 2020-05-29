@@ -276,6 +276,25 @@ asGenerator()
 > from generator 2
 > from generator undefined
 
+
+function* gen(i){
+  console.log(`print ${i}`);
+  const j = 5*(yield(i*10));
+  console.log(`print ${j}`);
+  const k = yield(2*j/4);
+  console.log(`print ${k}`);
+  return(i+j+k);
+}
+let g = gen(10);
+g.next(20);
+> print 10
+> {value: 100, done: false}
+g.next(10);
+> print 50
+> {value: 25, done: false}
+g.next(5);
+> print 5
+> {value: 65, done: true}
 ```
 
 ### Iterators
