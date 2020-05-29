@@ -279,6 +279,22 @@ asGenerator()
 ```
 
 ### Iterators
+| protocol | property | |
+| --- | --- | --- |
+| Iterable | [Symbol.iterator] | A zero-argument function that returns an 'Iterator' object|
+| Iterator | next() | a zero-argument function that return {value:,done:boolean}|
+
+```js
+let weekdays = new String("monday to friday");
+weekdays[Symbol.iterator] = function* () {
+  yield* ['m','t','w','th','f'];
+};
+[...weekdays]
+> (5) ["m", "t", "w", "th", "f"]
+weekdays+""
+> "monday to friday"
+```
+
 
 ### Async and Promises
 
