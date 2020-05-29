@@ -182,13 +182,6 @@ String.fromCodePoint(9731 /*HTML Entity*/, 0x0001D49F /*UTF-32*/)
 > "☃𝒟"
 
 ```
-
-### Class & Inheritance
-
-### Math & Number feature
-
-### new data structures
-
 ### Generators
 
 ```js
@@ -341,8 +334,85 @@ class WeekClass {
 > (5) ["m", "t", "w", "th", "f"]
 ```
 
+### Math & Number feature
+
+```js
+0xF     //#ES5
+> 15
+0b1111  //#ES2015
+> 15
+0o17    //#ES2015
+> 15
+> Number('0b1111')
+> 15
+
+Number.parseInt('111', 2)
+> 7
+Number.parseInt('111', 8)
+> 73
+Number.parseFloat(
+
+Number.isFinite('123')
+> false
+Number.isNaN('???')
+> false
+Number.isInteger('33')
+
+
+0.1 + 0.2 === 0.3
+> false
+Math.abs(0.1 + 0.2- 0.3)<Number.EPSILON
+> true
+
+//−2^53^ < i < 2^53^
+Number.MAX_SAFE_INTEGER
+> 9007199254740991
+Number.MIN_SAFE_INTEGER
+> -9007199254740991
+Number.isSafeInteger(Number.MIN_SAFE_INTEGER-1)
+> false
+
+Math.sign(0)
+> 0
+Math.sign(NaN)
+> NaN
+Math.trunc(3.1)
+> 3
+Math.cbrt(8)
+> 2
+> Math.expm1(1e-10) // more precise than Math.exp
+1.00000000005e-10
+Math.log1p(0)       // more precise than Math.log
+> 0
+Math.log2(8)
+> 3
+Math.log10(8)
+> 0.9030899869919435
+Math.fround(1.3)    //32 bit floating point
+> 1.2999999523162842
+//multiply two 32 bit int and returns the lower 32 bits 
+Math.imul(Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER)
+> 1
+//count leading 0 in 32 bit Int
+Math.clz32(0b01000000000000000000000000000000)
+> 1
+```
+#### Trigonometric Methods 
+- Math.sinh(x)
+- Math.cosh(x)
+- Math.tanh(x)
+- Math.asinh(x)
+- Math.acosh(x)
+- Math.atanh(x)
+- Math.hypot(...values)
+
+### Arrow function
+
+### new data structures
+
+### Class & Inheritance
 
 ### Async and Promises
 
-### Arrow function
+
 
