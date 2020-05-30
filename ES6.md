@@ -409,12 +409,49 @@ Math.clz32(0b01000000000000000000000000000000)
 ### Arrow function
 
 ```js
+(()=>(1))()
+> 1
+
 let f = ([a, b] = [1, 2], {x: c} = {x: a + b}) => ({a:a,b:b,c:c});
 f()
 > {a: 1, b: 2, c: 3}
 
-
 ```
+
+difference between Arrow and function
+- doesn't have this
+- doesn't have argument
+
+for function method, good general rule:
+- Use non-arrow functions for methods that will be called using the object.method() syntax. Those are the functions that will receive a meaningful this value from their caller.
+- Use arrow functions for everything else.
+```js
+let f = function(){return `arguments ${[...arguments]}`}
+f(1,2,3,4)
+> "arguments 1,2,3,4"
+let f = ()=>`argument ${[...arguments]}`
+f(1,2,3,4)
+> Uncaught ReferenceError: arguments is not defined
+
+
+et o = {
+  helper:function(c){console.log("Helper called from "+c)},
+  func:function(){
+    let innerfunc= function(){this.helper("func")}.bind(this);
+    innerfunc();
+  },
+  arrow:function(){
+    let innerfunc=()=>this.helper("arrow");
+    innerfunc();
+  }
+}
+o.func()
+> Helper called from func
+undefined
+o.arrow()
+> Helper called from arrow
+```
+
 ### new data structures
 
 ### Class & Inheritance
