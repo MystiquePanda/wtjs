@@ -416,11 +416,21 @@ let f = ([a, b] = [1, 2], {x: c} = {x: a + b}) => ({a:a,b:b,c:c});
 f()
 > {a: 1, b: 2, c: 3}
 
+let f = (a, b, c)
+  => 1;
+> Uncaught SyntaxError: Unexpected token '=>'
+
+let callback=()=>{};
+callback = callback || function() {};
+callback = callback || () => {};
+> Uncaught SyntaxError: Malformed arrow function parameter list
+callback = callback || (() => {});
 ```
 
 difference between Arrow and function
 - doesn't have this
 - doesn't have argument
+- doesn't have prototype
 
 for function method, good general rule:
 - Use non-arrow functions for methods that will be called using the object.method() syntax. Those are the functions that will receive a meaningful this value from their caller.
@@ -450,6 +460,9 @@ o.func()
 undefined
 o.arrow()
 > Helper called from arrow
+
+let f = () => {};
+console.log(f.prototype); 
 ```
 
 ## new data structures
