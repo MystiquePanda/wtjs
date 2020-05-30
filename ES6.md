@@ -1,4 +1,4 @@
-### var vs. let
+## var vs. let
 
 | var | let |
 | --- | --- |
@@ -40,7 +40,7 @@ for (var j = 0; j < 3; j++) {
 }
 ```
 
-### Destructuring
+## Destructuring
 
 ```js
 let [a,,[[b,,c],...d]]=[1,[[3,4],[5,6]]]
@@ -116,7 +116,7 @@ arr
 > [0, 1, 2, 3]
 ```
 
-### (Tagged) String Literals
+## (Tagged) String Literals
 
 ```js
 `\`` === '`'
@@ -158,7 +158,7 @@ highlight`${statement} by ${author}`;
 [https://codeburst.io/javascript-es6-tagged-template-literals-a45c26e54761]
 
 
-### String features
+## String features
 
 ```js
 "Some New methods".startsWith("Methods", 9)
@@ -182,7 +182,7 @@ String.fromCodePoint(9731 /*HTML Entity*/, 0x0001D49F /*UTF-32*/)
 > "☃𝒟"
 
 ```
-### Generators
+## Generators
 
 ```js
 
@@ -290,7 +290,7 @@ g.next(5);
 > {value: 65, done: true}
 ```
 
-### Iterators
+## Iterators
 | protocol | property | |
 | --- | --- | --- |
 | Iterable | [Symbol.iterator] | A zero-argument function that returns an 'Iterator' object|
@@ -334,7 +334,7 @@ class WeekClass {
 > (5) ["m", "t", "w", "th", "f"]
 ```
 
-### Math & Number feature
+## Math & Number feature
 
 ```js
 0xF     //#ES5
@@ -406,7 +406,7 @@ Math.clz32(0b01000000000000000000000000000000)
 - Math.atanh(x)
 - Math.hypot(...values)
 
-### Arrow function
+## Arrow function
 
 ```js
 (()=>(1))()
@@ -452,11 +452,11 @@ o.arrow()
 > Helper called from arrow
 ```
 
-### new data structures
+## new data structures
 
-### Class & Inheritance
+## Class & Inheritance
 
-### Async and Promises
+## Async and Promises
 
 
 
