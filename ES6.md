@@ -485,6 +485,37 @@ console.log(f.prototype);
 
 ## Class & Inheritance
 
+| | function | class |
+| | --- | --- |
+| hoisted | declaration hoisted | declaration NOT hoisted |
+| strict mode | need to specify into strict mode | within the class body's syntactic is always executed in strict mode |
+
+### This and class declaration
+```js
+class ClassObj { 
+  m() {return this;}
+  static sm() {return this;}
+}
+
+let o = new ClassObj();
+let objm = o.m;
+let staticm = Obj.sm;
+[o.m(),objm(),ClassObj.sm(),staticm()]
+> [ClassObj, undefined, ƒ, undefined]
+
+function FuncObj() { }
+FuncObj.prototype.m = function() { return this;}
+FuncObj.sm = function() { return this;}
+
+let o = new FuncObj();
+let objm = o.m;
+let staticm = FuncObj.sm;
+[o.m(),objm(),FuncObj.sm(),staticm()]
+> [FuncObj, Window, ƒ, Window]
+```
+
+
+
 ## Async and Promises
 
 
