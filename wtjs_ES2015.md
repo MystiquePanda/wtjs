@@ -489,6 +489,7 @@ console.log(f.prototype);
 | | --- | --- |
 | hoisted | declaration hoisted | declaration NOT hoisted |
 | strict mode | need to specify into strict mode | within the class body's syntactic is always executed in strict mode |
+| inheritance | [parent].call() | extends | 
 
 ### This and class declaration
 ```js
