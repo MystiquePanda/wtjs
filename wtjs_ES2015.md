@@ -451,6 +451,7 @@ difference between Arrow and function
 for function method, good general rule:
 - Use non-arrow functions for methods that will be called using the object.method() syntax. Those are the functions that will receive a meaningful this value from their caller.
 - Use arrow functions for everything else.
+
 ```js
 let f = function(){return `arguments ${[...arguments]}`}
 f(1,2,3,4)
@@ -580,6 +581,16 @@ h.roar();
 
 c instanceof Child
 > true
+
+function Factory(type) {
+  return class {
+    printType() { console.log(type) }
+  }
+}
+class Robot extends Factory("Robo") {}
+let r = new Robot();
+r.printType
+> Robo
 
 class MyArray extends Array {
   # override default constructors
