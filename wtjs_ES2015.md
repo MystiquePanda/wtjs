@@ -481,17 +481,42 @@ let f = () => {};
 console.log(f.prototype); 
 ```
 
-## new data structures
-
 ## Class & Inheritance
+
+*In fact, a class is actually a function under the hood in JavaScript*
 
 | | function | class |
 | | --- | --- |
 | hoisted | declaration hoisted | declaration NOT hoisted |
 | strict mode | need to specify into strict mode | within the class body's syntactic is always executed in strict mode |
-| inheritance | [parent].call() | extends | 
+| inheritance | [parent].call() | extends / super() | 
+
+### Object member
+four types of property/method: 
+- defined inside a constructor function that are given to object instances
+- defined directly on the constructor themselves, that are available only on the constructor *static properties/methods*
+- Defined on a constructor's prototype: inherited by all instances and inheriting object classes
+- those available on an object instance
+
 
 ### This and class declaration
+
+Syntax notes:
+- must call super() if there's a constructor
+- when there's a setter, the data property need to be a different name to distinguish from the setter.
+
+```js
+class SomeClass extends ParentClass {
+  constructor(myArgs, parentArgs) { 
+    super(parentArgs); 
+    this._myArgs = myArgs;   
+  }
+
+  get myArgs(){return this._myArgs}
+  set myArgs(arg){this._myArgs = args}
+}
+```
+
 ```js
 class ClassObj { 
   m() {return this;}
@@ -515,6 +540,78 @@ let staticm = FuncObj.sm;
 > [FuncObj, Window, ƒ, Window]
 ```
 
+### Inheritance
+
+- super(), can only be used in constructors, and must be called before the this keyword can be used.
+
+```js
+function Human (name) {
+  this.name = name;  
+}
+
+Human.prototype.speak = function () {
+  console.log(`${this.name} is Human.`);
+}
+
+class Child extends Human {
+  speak() {
+    console.log(`${this.name} is a child.`);
+  }
+}
+
+let c = new Child('Yoda');
+c.speak(); 
+> Yoda is the child.
+let p = new Parent('Yoda');
+p.speak()
+> Yoda is the parent.
+
+let Animal = {
+  roar() {
+    console.log(`${this.name} is an Animal.`);
+  }
+};
+
+Object.setPrototypeOf(Human.prototype, Animal);
+
+let h = new Human('Adam');
+h.roar();
+> Adam is an Animal.
+
+c instanceof Child
+> true
+
+class MyArray extends Array {
+  # override default constructors
+  static get [Symbol.species]() { return Array; }
+}
+let a = new MyArray(1,2,3);
+let mapped = a.map(x => x * x);
+[mapped instanceof MyArray,mapped instanceof Array]
+> [false,true]
+
+```
+
+### Mix-ins
+
+```js
+let redMixin = Base => class extends Base {
+  color() { return "red" }
+  print() { return "redMixin" }
+};
+
+let ballMixin = Base => class extends Base {
+  shape() { return "ball" }
+  print() { return "ballMixin" }
+};
+
+class Basketball extends ballMixin(redMixin(SportsEquipment)) { }
+let b = new Basketball()
+[b.color(),b.shape(),b.print()]
+> ["red", "ball", "ballMixin"]
+```
+
+## new data structures
 
 
 ## Async and Promises
