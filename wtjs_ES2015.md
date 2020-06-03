@@ -488,7 +488,7 @@ console.log((function(){}).prototype);
 *In fact, a class is actually a function under the hood in JavaScript*
 
 | | function | class |
-| | --- | --- |
+| --- | --- | --- |
 | hoisted | declaration hoisted | declaration NOT hoisted |
 | strict mode | need to specify into strict mode | within the class body's syntactic is always executed in strict mode |
 | inheritance | [parent].call() | extends / super() | 
