@@ -425,10 +425,10 @@ Math.clz32(0b01000000000000000000000000000000)
 ## Arrow function
 
 ```js
-(()=>(1))()
-> 1
+[(x=>1)(),(x=>(1))(),(()=>1)(),(x=>{1})()]
+> (4) [1, 1, 1, undefined]
 
-let f = ([a, b] = [1, 2], {x: c} = {x: a + b}) => ({a:a,b:b,c:c});
+let f = ([a, b] = [1, 2], {x: c} = {x: a + b}) => {a:a,b:b,c:c};
 f()
 > {a: 1, b: 2, c: 3}
 
@@ -436,6 +436,7 @@ let f = (a, b, c)
   => 1;
 > Uncaught SyntaxError: Unexpected token '=>'
 
+//short circuit
 let callback=()=>{};
 callback = callback || function() {};
 callback = callback || () => {};
@@ -444,7 +445,7 @@ callback = callback || (() => {});
 ```
 
 difference between Arrow and function
-- doesn't have this
+- doesn't have this (lexically bind their context)
 - doesn't have argument
 - doesn't have prototype
 
@@ -453,15 +454,13 @@ for function method, good general rule:
 - Use arrow functions for everything else.
 
 ```js
-let f = function(){return `arguments ${[...arguments]}`}
-f(1,2,3,4)
+(function(){return `arguments ${[...arguments]}`})(1,2,3,4)
 > "arguments 1,2,3,4"
-let f = ()=>`argument ${[...arguments]}`
-f(1,2,3,4)
+(()=>`argument ${[...arguments]}`)(1,2,3,4)
 > Uncaught ReferenceError: arguments is not defined
 
 
-et o = {
+let o = {
   helper:function(c){console.log("Helper called from "+c)},
   func:function(){
     let innerfunc= function(){this.helper("func")}.bind(this);
@@ -478,8 +477,10 @@ undefined
 o.arrow()
 > Helper called from arrow
 
-let f = () => {};
-console.log(f.prototype); 
+console.log((() => {}).prototype);
+> undefined
+console.log((function(){}).prototype); 
+> {constructor: ƒ}
 ```
 
 ## Class & Inheritance
