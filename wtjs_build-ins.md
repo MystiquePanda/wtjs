@@ -522,11 +522,11 @@ let np =Object.appendChain(p, MySymbol={
 
 ### Function
 
-| term | | 
-|--- | --- |
-| Function Constructor | new Function('content');
-| Function Expression  | let x = function(){}
-| Function Declaration | function hoisted() {} |
+| term | | hoisted?
+|--- | --- | |
+| Function Constructor | new Function('content') | NO | 
+| Function Expression  | let x = function(){} | NO | 
+| Function Declaration | function myFunc(){} | YES | 
 
 Function constructor do not create closures to their creation contexts - created in the global scope.
 ```js
@@ -606,12 +606,33 @@ function longestString() {
 #### Instance methods (Function.prototype)
 | methods | |
 | --- | --- | 
-| apply(thisArg [, argsArray]) | |
-| bind(thisArg[, arg1[, arg2[, ...argN]]]) |  | 
-| call(thisArg[, arg1, arg2, ...argN]) | | 
+| bind(thisArg[, arg1[, arg2[, ...argN]]]) | creates a new bound function|  
+| call(thisArg[, arg1, arg2, ...argN]) | accepts an argument list | 
+| apply(thisArg [, argsArray]) | accepts a single array of arguments. use null or undefined when no args needed|
 | toString() | |
 
+```js
+let base = [0, 1, 2];
+base.push.apply(base, ['three', 'four', 'five'])
+base
+> (5) [0, 1, 2, "three", "four", "five"]
 
+// argument limit of 65536!
+Math.max.apply(null, [5, 6, 2, 3, 7]);
+
+// create a new object with array rather than lots of arguments
+Function.prototype.construct = function(aArgs) {
+  let oNew = Object.create(this.prototype);
+  this.apply(oNew, aArgs);
+  return oNew;
+};
+
+let o = {random: true}
+let f = function(){return this.random}
+[f(),f.bind(o)()]
+> (2) [undefined, true]
+
+```
 
 ### Symbol
 
