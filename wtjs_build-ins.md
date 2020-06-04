@@ -350,20 +350,16 @@ Object.getOwnPropertyDescriptor(Symbol.for('noError'),0)
 
 *Shallow* copy of all *enumerable data properties* can be done using Object.assign().
 ```js
-let s1 = {[Symbol("s")]:"special","s":"normal","one":true}
-let s2 = {[Symbol("s")]:"special2","s":"normal2","two":true}
+let s1 = {[Symbol.for("s")]:"special","s":"normal","one":true}
+let s2 = {[Symbol.for("s")]:"special2","s":"normal2","two":true}
 let t = {"three":true}
 Object.assign(t, s1, s2)
-{three: true, s: "normal2", one: true, two: true, Symbol(s): "special", Symbol(s): "special2"}
-
+{three: true, s: "normal2", one: true, two: true, Symbol(s): "special2"}
 
 Object.assign({},"string",true,10,10n,true,undefined,null,Infinity,NaN)
 > {0: "s", 1: "t", 2: "r", 3: "i", 4: "n", 5: "g"}
 
-const b = Object.defineProperty({},"bomb",{value:"hidden",writable: false})
-
-
-const b = Object.defineProperty({},"bomb",{value:"hidden",writable: false})
+const b = Object.defineProperty({},"bomb",{value:"hidden",writable: false});
 Object.assign(b, { a: 0 }, { b: 1, bomb: "kaboom", c: 2 }, { d: 3 });
 > VM1165:1 Uncaught TypeError: Cannot assign to read only property 
 b
