@@ -526,6 +526,38 @@ let np =Object.appendChain(p, MySymbol={
 
 ### Function
 
+| term | | 
+|--- | --- |
+| Function Constructor | new Function('content');
+| Function Expression  | let x = function(){}
+| Function Declaration | function hoisted() {} |
+
+Function constructor do not create closures to their creation contexts - created in the global scope.
+```js
+let x = 10;
+function funcConstruction() {
+    let x = -10;
+    return new Function('return x;');
+}
+function funcDeclaration() {
+    let x = -10;
+    return function f() {return x;};
+}
+
+[funcConstruction()(),funcDeclaration()()]
+> [10, 20]
+
+
+var hoisted = "func" in this;
+console.log(`'func' ${hoisted ? "is" : "is not"} hoisted. typeof func is ${typeof func}`);
+if (false) {
+  function func(){ return 1; }
+}
+> 'func' is hoisted. typeof func is undefined
+
+```
+
+
 #### Instance properties
 | properties | | 
 | --- | --- |
