@@ -495,10 +495,95 @@ let np =Object.appendChain(p, MySymbol={
 
 #### Instance properties
 
-#### Instance methods
+| properties | |
+| --- | --- |
+| constructor | reference to the function itself. read-only for primitive values |
+| __ __proto__ __ | recommended to use Object.getPrototypeOf() instead|
+| __ __noSuchMethod__ __ | non-standard & deprecated. Proxy instead | 
 
+```js
+(new Array).constructor === Array
+> true
+
+```
+
+#### Instance methods (Object.prototype)
+
+| methods | |
+| --- | --- |
+| __ __defineGetter__ __() | deprecated, Object.defineProperty() | 
+| __ __defineSetter__ __() | deprecated, Object.defineProperty() |
+| __ __lookupGetter__ __() | to be deprecated. returns getter of property |
+| __ __lookupSetter__ __() | to be deprecated. returns setter of property |
+| hasOwnProperty() | true if the specified property is a direct property | 
+| isPrototypeOf() | check if argument object is descends from caller prototype |
+| propertyIsEnumerable() | check if argument property is enumerable and is the caller's own property. |
+| toLocaleString() | toString() by default, meant to be overriden |
+| toString() | string representing the object, default "[object type]"|
+| unwatch() | deprecated, use setter/getter or proxy |
+| valueOf() | returns the primitive value of the specified object |
+| watch() |  deprecated, use setter/getter or proxy |
 
 ### Function
+
+#### Instance properties
+| properties | | 
+| --- | --- |
+| function.arguments | Deprecated. use arguments object instead | 
+| function.caller |  Deprecated |
+| function.displayName | non-standard |
+| function.name| don't use when code are being minified | 
+| function.length| return expected argument number | 
+
+```js
+// Array-like but not an Array
+(function(){console.log(arguments)})()
+> callee: ƒ ()
+> length: 0
+> Symbol(Symbol.iterator): ƒ values()
+> __proto__: Object
+
+function longestString() {
+  var longest = '';
+  for (var i=0; i < arguments.length; i++) {
+    if (arguments[i].length > longest.length) {
+      longest = arguments[i];
+    }
+  }
+  return longest;
+}
+
+(function func(a = 55) {
+  console.log(arguments[0]);
+  arguments[0] = 99;
+  console.log(a);
+})(-10)
+> -10
+> -10
+
+(function func(a = 55) {
+  console.log(arguments[0]);
+})()
+> undefined
+
+
+(function(){}).length
+> 0 
+(function(...args) {}).length
+> 0
+(function(a = 1, b, c) {}).length
+> 0
+```
+
+#### Instance methods (Function.prototype)
+| methods | |
+| --- | --- | 
+| apply(thisArg [, argsArray]) | |
+| bind(thisArg[, arg1[, arg2[, ...argN]]]) |  | 
+| call(thisArg[, arg1, arg2, ...argN]) | | 
+| toString() | |
+
+
 
 ### Symbol
 
