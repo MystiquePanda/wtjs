@@ -253,13 +253,13 @@ oempty.toString()
 > "[object Object]"
 onull.toString()
 > VM56604:1 Uncaught TypeError: y.toString is not a function
-
-onull = Object.create( null );                  // create "null" object (same as before)
 Object.setPrototypeOf(onull, Object.prototype); 
+onull.toString()
+> "[object Object]"
 
 const source = { a: 1, b: 2, c: 3 };
-let target = Object.fromEntries(Object.entries(x).map(([ key, val ]) => [ key, val * 2 ])
-);
+Object.fromEntries(Object.entries(source).map(([ key, val ]) => [ key, val * 2 ]))
+> {a: 2, b: 4, c: 6}
 ```
 
 #### Static Methods
