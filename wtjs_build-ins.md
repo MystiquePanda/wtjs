@@ -631,9 +631,26 @@ let o = {random: true}
 let f = function(){return this.random}
 [f(),f.bind(o)()]
 > (2) [undefined, true]
-
+[Object.getOwnPropertyDescriptors(f.bind(o)),Object.getOwnPropertyDescriptors(f)]
+> ["bound f","f"]
 ```
 
 ### Symbol
 
+
+
 ### Boolean
+
+primitive Boolean true and false !== true and false of Boolean object
+```js
+// Any object that is not undefined or null
+let x = new Boolean(false);
+if (x) {
+  console.log("fake truth");
+}
+> fake truth
+
+
+
+```
+
