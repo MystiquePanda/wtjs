@@ -1,4 +1,4 @@
-## Value Properties
+# Value Properties
 
 ### infinity
 
@@ -43,7 +43,7 @@ a cross environment (node.js, browser, web worker...) way of accessing the globa
 **NOT supported by IE**
 
 
-## Function properties
+# Function properties
 
 ### eval()
 **eval() is dangerous and slow - it invokes JS interpreter, DO NOT USE**
@@ -148,7 +148,6 @@ parseFloat({valueOf:undefined, toString:undefined})
 VM4867:1 Uncaught TypeError: Cannot convert object to primitive value
 ```
 
-
 ### parseInt()
 
 ```js
@@ -227,7 +226,7 @@ decodeQueryParam('search+query%20%28correct%29');
 when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply (see parseFloat)
 
 
-## Fundamental objects
+# Fundamental objects
 
 ### Object
 
@@ -636,7 +635,71 @@ let f = function(){return this.random}
 ```
 
 ### Symbol
+"primitive data type"
 
+```js
+let u = new Symbol('unique')
+> VM422:1 Uncaught TypeError: Symbol is not a constructor
+
+```
+
+#### Static Properties & Methods
+
+Symbol.asyncIterator
+A method that returns the default AsyncIterator for an object. Used by for await...of.
+Symbol.hasInstance
+A method determining if a constructor object recognizes an object as its instance. Used by instanceof.
+Symbol.isConcatSpreadable
+A Boolean value indicating if an object should be flattened to its array elements. Used by Array.prototype.concat().
+Symbol.iterator
+A method returning the default iterator for an object. Used by for...of.
+Symbol.match
+A method that matches against a string, also used to determine if an object may be used as a regular expression. Used by String.prototype.match().
+Symbol.matchAll
+A method that returns an iterator, that yields matches of the regular expression against a string. Used by String.prototype.matchAll().
+Symbol.replace
+A method that replaces matched substrings of a string. Used by String.prototype.replace().
+Symbol.search
+A method that returns the index within a string that matches the regular expression. Used by String.prototype.search().
+Symbol.split
+A method that splits a string at the indices that match a regular expression. Used by String.prototype.split().
+Symbol.species
+A constructor function that is used to create derived objects.
+Symbol.toPrimitive
+A method converting an object to a primitive value.
+Symbol.toStringTag
+A string value used for the default description of an object. Used by Object.prototype.toString().
+Symbol.unscopables
+An object value of whose own and inherited property names are excluded from the with environment bindings of the associated object.
+
+```js
+Symbol('unique') === Symbol('unique')
+> false
+Symbol.for('common') === Symbol.for('common')
+> true
+
+Symbol.keyFor(Symbol.for('common'))
+> "common"
+```
+
+#### Instance Properties & Methods
+
+```js
+Symbol.for('unique').description
+> "unique"
+
+Object.getPrototypeOf(Symbol.for('unique'))
+> Symbol {Symbol(Symbol.toStringTag): "Symbol", 
+> constructor: ƒ, toString: ƒ, valueOf: ƒ, …}
+> constructor: ƒ Symbol()
+> description: (...)
+> toString: ƒ toString()
+> valueOf: ƒ valueOf()
+> Symbol(Symbol.toPrimitive): ƒ [Symbol.toPrimitive]()
+> Symbol(Symbol.toStringTag): "Symbol"
+> get description: ƒ description()
+> __proto__: Object
+```
 
 
 ### Boolean
@@ -650,7 +713,33 @@ if (x) {
 }
 > fake truth
 
+### Error objects
+-Error
+-AggregateError 
+-EvalError
+-InternalError 
+-RangeError
+-ReferenceError
+-SyntaxError
+-TypeError
+-URIError
 
+# Numbers and dates
+
+# Text Processing
+
+# Collections
+
+# Structured Data
+
+# Reflection
+
+# Internationlization
+
+# Control abstraction objects
+
+
+# WebAssembly
 
 ```
 
