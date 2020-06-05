@@ -717,15 +717,15 @@ if (x) {
 
 ### Error objects
 
--Error
--AggregateError 
--EvalError
--InternalError 
--RangeError
--ReferenceError
--SyntaxError
--TypeError
--URIError
+- Error
+- AggregateError 
+- EvalError
+- InternalError 
+- RangeError
+- ReferenceError
+- SyntaxError
+- TypeError
+- URIError
 
 
 # Numbers and dates
