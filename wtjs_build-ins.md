@@ -358,7 +358,7 @@ Object.assign(t, s1, s2)
 Object.assign({},"string",true,10,10n,true,undefined,null,Infinity,NaN)
 > {0: "s", 1: "t", 2: "r", 3: "i", 4: "n", 5: "g"}
 
-const b = Object.defineProperty({},"bomb",{value:"hidden",writable: false});
+let b = Object.defineProperty({},"bomb",{value:"hidden",writable: false});
 Object.assign(b, { a: 0 }, { b: 1, bomb: "kaboom", c: 2 }, { d: 3 });
 > VM1165:1 Uncaught TypeError: Cannot assign to read only property 
 b
@@ -397,7 +397,7 @@ let x = {}
 Object.defineProperties(x,{
   visible:{value:true, enumerable: true}, 
   hidden:{value: false, enurable: false}});
-Object.defineProperty(o, Symbol.for('special'), {
+Object.defineProperty(x, Symbol.for('special'), {
   value: Infinity, enumerable: true});
 
 Object.keys(x)
@@ -435,8 +435,8 @@ let o = Object.create(null)
 Object.getPrototypeOf(o)
 > null
 
-const proto = {random:true};
-const o = Object.create(proto);
+let proto = {random:true};
+let o = Object.create(proto);
 console.log(Object.getPrototypeOf(o) === proto);
 > true
 
@@ -521,8 +521,8 @@ let np =Object.appendChain(p, MySymbol={
 
 ### Function
 
-| term | | hoisted?
-|--- | --- | |
+| term | | hoisted? |
+|--- | --- | --- |
 | Function Constructor | new Function('content') | NO | 
 | Function Expression  | let x = function(){} | NO | 
 | Function Declaration | function myFunc(){} | YES | 
@@ -641,36 +641,32 @@ let f = function(){return this.random}
 let u = new Symbol('unique')
 > VM422:1 Uncaught TypeError: Symbol is not a constructor
 
+JSON.stringify({[Symbol('foo')]: 'foo'})
+> "{}"
+
+let sym = Symbol('random')
+let obj = {[sym]: false}
+obj[sym]
+obj[Object(sym)]
 ```
 
 #### Static Properties & Methods
 
-Symbol.asyncIterator
-A method that returns the default AsyncIterator for an object. Used by for await...of.
-Symbol.hasInstance
-A method determining if a constructor object recognizes an object as its instance. Used by instanceof.
-Symbol.isConcatSpreadable
-A Boolean value indicating if an object should be flattened to its array elements. Used by Array.prototype.concat().
-Symbol.iterator
-A method returning the default iterator for an object. Used by for...of.
-Symbol.match
-A method that matches against a string, also used to determine if an object may be used as a regular expression. Used by String.prototype.match().
-Symbol.matchAll
-A method that returns an iterator, that yields matches of the regular expression against a string. Used by String.prototype.matchAll().
-Symbol.replace
-A method that replaces matched substrings of a string. Used by String.prototype.replace().
-Symbol.search
-A method that returns the index within a string that matches the regular expression. Used by String.prototype.search().
-Symbol.split
-A method that splits a string at the indices that match a regular expression. Used by String.prototype.split().
-Symbol.species
-A constructor function that is used to create derived objects.
-Symbol.toPrimitive
-A method converting an object to a primitive value.
-Symbol.toStringTag
-A string value used for the default description of an object. Used by Object.prototype.toString().
-Symbol.unscopables
-An object value of whose own and inherited property names are excluded from the with environment bindings of the associated object.
+| Property | Return Type | Description | Usage |
+| --- | --- | --- | --- | 
+| Symbol.asyncIterator | method | object's default AsyncIterator | await...of | 
+| Symbol.hasInstance | method | if a constructor recognizes the argument as its instance | instanceof | 
+| Symbol.isConcatSpreadable | Boolean | if an object should be flattened to its array elements | Array.prototype.concat() | 
+| Symbol.iterator | method | default iterator for an object | for...of | 
+| Symbol.match | method | matches against a string, also to determine if an object may be used as a regex | String.prototype.match() | 
+| Symbol.matchAll | method | returns an iterator, that yields matches of the regex against a string | String.prototype.matchAll() | 
+| Symbol.replace | method | replaces matched substrings of a string | String.prototype.replace() | 
+| Symbol.search | method | the index within a string that matches the regex | String.prototype.search() | 
+| Symbol.species | constructor function | used to create derived objects | |
+| Symbol.toPrimitive | method | converting an object to a primitive value | |
+| Symbol.toStringTag | string | the default description of an object | Object.prototype.toString() | 
+| Symbol.unscopables | object | property names that are excluded from the environment bindings of the associated object | |
+
 
 ```js
 Symbol('unique') === Symbol('unique')
@@ -701,10 +697,10 @@ Object.getPrototypeOf(Symbol.for('unique'))
 > __proto__: Object
 ```
 
-
 ### Boolean
 
-primitive Boolean true and false !== true and false of Boolean object
+primitive Boolean true & false !== true & false of Boolean object
+
 ```js
 // Any object that is not undefined or null
 let x = new Boolean(false);
@@ -713,7 +709,14 @@ if (x) {
 }
 > fake truth
 
+[Boolean(0), Boolean(-0), Boolean(null), Boolean(false), Boolean(NaN), Boolean(undefined), Boolean('')]
+> (7) [false, false, false, false, false, false, false]
+[Boolean(true), Boolean('true'), Boolean('false'), Boolean('random'), Boolean([]), Boolean({})]
+> (6) [true, true, true, true, true, true]
+```
+
 ### Error objects
+
 -Error
 -AggregateError 
 -EvalError
@@ -724,21 +727,105 @@ if (x) {
 -TypeError
 -URIError
 
+
 # Numbers and dates
 
+### Number
+
+```js
+123 === 123.0 
+> true
+
+Number(254).toString(16)
+>"fe"
+Number(-0xff).toString(2)
+> "-11111111"
+
+// locale and the fallback language
+Number(12345.6789).toLocaleString(['ban', 'id'])
+"12.345,679"
+
+// locale and number type
+Number(12345.6789).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
+> "12.345,68 €"
+
+// local locale and config
+Number(12345.6789).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+> "12,345.68"
+
+```
+  
+| caller| args | toFixed() | toPrecision() |
+| --- | --- | --- | --- |
+|Number(3.14159)| none | "3" | "3.14159" |
+|Number(3.14159)| 0 | "3" | RangeError |
+|Number(3.14159)| 4 | "3.1416" | "3.142" |
+|Number(3.14159)| 7 | "3.1415900" | "3.141590" |
+|Number(3.14159)| 101 | RangeError | RangeError |
+|Number(100) | 1 | "100.0" | "1e+2" |
+|Number(100) | 3 | "100.000"| "100" |
+|Number(2.35) | 1 | "2.4" | "2" |
+|*Number(2.55)* | 1 | "2.5" | "3" |
+|Number(-2.35) | 1 |"-2.4"| "-2" |
+|-2.35 | 1| -2.4 | -2 | 
+
+*Floating point precision issue*
+
+## BigInt
+2^53 - 1
+
+```js
+1n+1n*10
+> Uncaught TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+5n / 2n
+> 2n
+
+1n+2n*10n%7n-5n**2n
+> -18n
+5n&13n|5n
+>5n
+
+let mixed = [4n, 6, -12n, 10, 4, 0, 0n]
+mixed.sort()
+> [-12n, 0, 0n, 10, 4n, 4, 6]
+mixed.sort((a, b) => a - b) 
+> Uncaught TypeError: Cannot mix BigInt and other types, use explicit conversions
+mixed.sort((a, b) => (a < b) ? -1 : ((a > b) ? 1 : 0))
+> [-12n, 0, 0n, 4n, 4, 6, 10]
+
+let max = 2n ** (10n - 1n) - 1n;
+BigInt.asIntN(10, max);
+> 511n
+BigInt.asIntN(10, max + 1n);
+> -512n
+
+let max = 2n ** 64n - 1n;
+BigInt.asUintN(64, max)
+>18446744073709551615n
+BigInt.asUintN(64, max+1n) 
+> 0n //overflow
+```
+
+A BigInt behaves like a Number in cases where:
+-converted to a Boolean: via the Boolean function;
+-logical operators ||, &&, and !; or
+-conditional test ie. if
+
+```js
+JSON.stringify(BigInt(1)) 
+> Uncaught TypeError: Do not know how to serialize a BigInt
+BigInt.prototype.toJSON = function() { return this.toString()  }
+JSON.stringify(BigInt(1)) 
+> ""1""
+```
+
 # Text Processing
-
 # Collections
-
 # Structured Data
-
 # Reflection
-
-# Internationlization
-
 # Control abstraction objects
-
-
+# Internationlization
 # WebAssembly
 
 ```
