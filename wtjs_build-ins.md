@@ -912,10 +912,58 @@ d.toLocaleString('de-DE', options)
 
 ### String
 
+```js
+[typeof "wtjs", typeof new String("wtjs")]
+> (2) ["string", "object"]
+
+"wtjs".padEnd(10,"*")
+> "wtjs******"
+```
 
 ### RegExp
 
+```js
+let r = /ab+c/i;
+new RegExp(/ab+c/, 'i') // literal notation
+new RegExp('ab+c', 'i') // constructor
+[typeof r,Object.getPrototypeOf(r).constructor.name]
+> ["object", "RegExp"]
+
+"John Smith".replace(/(\w+)\s(\w+)/, "$2, $1")
+>"Smith, John"
+
+let text = 'Some text\nAnd some more\r\nAnd yet\rThis is the end'
+text.split(/\r\n|\r|\n/)
+> (4) ["Some text", "And some more", "And yet", "This is the end"]
+
+let url = 'http://mysub.domain.com'
+/[^.]+/.exec(url)[0].substr(7)
+> "mysub"
+```
+
 # Collections
+
+### Array
+
+
+
+
+#### Uniform Typed Array
+
+Int8Array
+Uint8Array
+Uint8ClampedArray
+Int16Array
+Uint16Array
+Int32Array
+Uint32Array
+Float32Array
+Float64Array
+BigInt64Array
+BigUint64Array
+
+### Map
+
 # Structured Data
 # Reflection
 # Control abstraction objects
