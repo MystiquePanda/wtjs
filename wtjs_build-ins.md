@@ -771,7 +771,7 @@ Number(12345.6789).toLocaleString(undefined, {minimumFractionDigits: 2, maximumF
 
 *Floating point precision issue*
 
-## BigInt
+### BigInt
 2^53 - 1
 
 ```js
@@ -819,7 +819,7 @@ BigInt.prototype.toJSON = function() { return this.toString()  }
 JSON.stringify(BigInt(1)) 
 > ""1""
 ```
-## Math
+### Math
 
 *Math works with the Number type. It doesn't work with BigInt*
 All properties and methods of Math are static!
@@ -856,10 +856,65 @@ All properties and methods of Math are static!
 | Math.atan2(y, x)|     |
 
 
+### Date
 
-## Date
+*epoch: midnight on January 1, 1970, UTC*
+
+```js
+Date.now()  //milliseconds since epoch
+1591470914447
+```
+
+#### Instance Methods 
+```js
+let d = new Date(Date.UTC(2020, 5, 8, 19, 10, 0));  // month is 0 indexed
+> Mon Jun 08 2020 15:10:00 GMT-0400 (Eastern Daylight Time)
+
+let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+d.toLocaleString('de-DE', options)
+"Montag, 8. Juni 2020"
+```
+#### Date Parts
+
+| getter | setter | UTC getter | UTC setter |
+| --- | --- | --- | --- |
+|getFullYear() |setFullYear() |getUTCFullYear() |setUTCFullYear()  |
+|getYear()| setYear() | | |
+|getMonth() |setMonth() |getUTCMonth() | setUTCMonth() |
+|getDate()| setDate()|getUTCDate() |setUTCDate()|
+|getDay() | |getUTCDay()  |  |
+|getTime() |setTime() | |  |
+|getHours() |setHours() |getUTCHours() | setUTCHours() |
+|getMinutes() |setMinutes() |getUTCMinutes() | setUTCMinutes() |
+|getSeconds() |setSeconds() |getUTCSeconds() | setUTCSeconds() |
+|getMilliseconds() |setMilliseconds() |getUTCMilliseconds() | setUTCMilliseconds() |
+|getTimezoneOffset() | | |  |
+
+#### Printing Dates
+
+| method | description | output |
+| --- | --- | --- | 
+| toDateString() | "date" portion of the Date | "Mon Jun 08 2020" | 
+| toISOString() | ISO 8601 Extended Format | "2020-06-08T19:10:00.000Z" |
+| toJSON() | used by JSON.stringify() | "2020-06-08T19:10:00.000Z" |
+| toGMTString() | deprecated. Use toUTCString() instead |  |
+| toUTCString() | string using the UTC timezone | "Mon, 08 Jun 2020 19:10:00 GMT" |
+| toLocaleDateString() | based on system settings | "6/8/2020" |
+| toLocaleFormat() | deprecated |  |
+| toLocaleString() | Overrides Object.prototype.toLocaleString() | "6/8/2020, 3:10:00 PM" |
+| toLocaleTimeString() | locality-sensitive representation of the time | "3:10:00 PM" |
+| toTimeString() | "time" portion in system locale | "15:10:00 GMT-0400 (Eastern Daylight Time)" |
+| toString() | | "Mon Jun 08 2020 15:10:00 GMT-0400 (Eastern Daylight Time)" |
+| valueOf() | | 1591643400000 |
+
 
 # Text Processing
+
+### String
+
+
+### RegExp
+
 # Collections
 # Structured Data
 # Reflection
