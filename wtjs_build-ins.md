@@ -819,6 +819,45 @@ BigInt.prototype.toJSON = function() { return this.toString()  }
 JSON.stringify(BigInt(1)) 
 > ""1""
 ```
+## Math
+
+*Math works with the Number type. It doesn't work with BigInt*
+All properties and methods of Math are static!
+
+
+| |  -5.05| 0.59 | null | undefined| |
+| --- | --- | --- | --- | --- | --- |
+|Math.floor(x) | -6 | 0 | 0 | NaN | |
+|Math.ceil(x)  | -5 | 1 | 0 | NaN | |
+|Math.round(x) | -5 | 1 | 0 | NaN | rounded to the nearest int |
+|Math.trunc(x) | -5 | 0| 0 | NaN | integer part by removing decimals |
+|Math.fround(x) | -5.050..| 0.589.. | 0 | NaN | nearest 32-bit single precision float |
+
+- Math.random()
+- Math.abs(x)
+- Math.max([x[, y[, …]]]), Math.min([x[, y[, …]]])
+- Math.pow(x, y)
+- Math.sign(x)
+- Math.sqrt(x), Math.cbrt(x)
+- Math.clz32(x)
+- Math.exp(x), Math.expm1(x)
+- Math.imul(x, y)
+- Math.log(x), Math.log1p(x), Math.log10(x), Math.log2(x)
+- Math.hypot([x[, y[, …]]])
+
+| Trignometric | hyperbolic #ES2015 |
+| --- | --- |
+| Math.cos(x)| Math.cosh(x) |
+| Math.sin(x)| Math.sinh(x)    |
+| Math.tan(x)| Math.tanh(x) |
+| Math.asin(x)| Math.asinh(x) |
+| Math.acos(x)| Math.acosh(x) |
+| Math.atan(x)| Math.atanh(x) |
+| Math.atan2(y, x)|     |
+
+
+
+## Date
 
 # Text Processing
 # Collections
