@@ -540,7 +540,7 @@ function funcDeclaration() {
 }
 
 [funcConstruction()(),funcDeclaration()()]
-> [10, 20]
+> [10, -10]
 
 
 var hoisted = "func" in this;
