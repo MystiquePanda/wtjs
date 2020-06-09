@@ -526,6 +526,8 @@ class ClassObj {
   static sm() {return this;}
 }
 
+// Autoboxing: if this=undefined, this = globalThis, 
+// Autoboxing disabled when in strict mode
 let o = new ClassObj();
 let objm = o.m;
 let staticm = ClassObj.sm;
