@@ -485,12 +485,13 @@ console.log((function(){}).prototype);
 
 ## Class & Inheritance
 
-*In fact, a class is actually a function under the hood in JavaScript*
+*a class is actually a function under the hood in JavaScript*
+*...and functions are objects*
 
 | | function | class |
 | --- | --- | --- |
 | hoisted | declaration hoisted | declaration NOT hoisted |
-| strict mode | need to specify into strict mode | within the class body's syntactic is always executed in strict mode |
+| strict mode | need to specify into strict mode | strict mode is enforced within the class body's syntactic|
 | inheritance | [parent].call() | extends / super() | 
 
 ### Object member
@@ -498,7 +499,7 @@ four types of property/method:
 - defined inside a constructor function that are given to object instances
 - defined directly on the constructor themselves, that are available only on the constructor *static properties/methods*
 - Defined on a constructor's prototype: inherited by all instances and inheriting object classes
-- those available on an object instance
+- available on an object instance
 
 
 ### This and class declaration
@@ -527,7 +528,7 @@ class ClassObj {
 
 let o = new ClassObj();
 let objm = o.m;
-let staticm = Obj.sm;
+let staticm = ClassObj.sm;
 [o.m(),objm(),ClassObj.sm(),staticm()]
 > [ClassObj, undefined, ƒ, undefined]
 
@@ -547,51 +548,44 @@ let staticm = FuncObj.sm;
 - super(), can only be used in constructors, and must be called before the this keyword can be used.
 
 ```js
-function Human (name) {
+function Animal (name) {
   this.name = name;  
 }
 
-Human.prototype.speak = function () {
-  console.log(`${this.name} is Human.`);
+Animal.prototype.speak = function () {
+  console.log(`${this.name} is an Animal.`);
 }
 
-class Child extends Human {
+class Mammal extends Animal {
   speak() {
-    console.log(`${this.name} is a child.`);
+    console.log(`${this.name} is a Mammal .`);
   }
 }
 
-let c = new Child('Yoda');
-c.speak(); 
-> Yoda is the child.
-let p = new Parent('Yoda');
-p.speak()
-> Yoda is the parent.
+let p = new Animal('Dinosaur');
+p.speak(); 
+> Dinosaur is an Animal.
+let c = new Mammal('Yoda');
+c.speak();
+> Yoda is a Mammal.
 
-let Animal = {
+let Dinosaur = {
   roar() {
-    console.log(`${this.name} is an Animal.`);
+    console.log(`${this.name} is a Dinosaur.`);
   }
 };
 
-Object.setPrototypeOf(Human.prototype, Animal);
+Object.setPrototypeOf(Animal.prototype, Dinosaur);
 
-let h = new Human('Adam');
+let h = new Animal('Chicken');
 h.roar();
-> Adam is an Animal.
+> Chicken is a Dinosaur.
 
-c instanceof Child
-> true
+[c instanceof Mammal;c instanceof Animal]
+> [true;true]
+[p.constructor === Mammal;p.constructor === Animal]
+> [true;false]
 
-function Factory(type) {
-  return class {
-    printType() { console.log(type) }
-  }
-}
-class Robot extends Factory("Robo") {}
-let r = new Robot();
-r.printType
-> Robo
 
 class MyArray extends Array {
   # override default constructors
@@ -607,6 +601,25 @@ let mapped = a.map(x => x * x);
 ### Mix-ins
 
 ```js
+function Factory(type) {
+  return class {
+    printType() { return type }
+  }
+}
+class Robot extends Factory("Robo") {
+  speak(){console.log(`I'm a ${this.printType()}`);}
+}
+let r = new Robot();
+r.speak()
+> I'm a Robo
+
+
+class SportsEquipment {
+    type(){
+      return "SportsEquipment";
+    }
+}
+
 let redMixin = Base => class extends Base {
   color() { return "red" }
   print() { return "redMixin" }
