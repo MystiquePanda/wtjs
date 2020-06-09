@@ -640,6 +640,13 @@ let b = new Basketball()
 
 ## new data structures
 
+### Set
+
+### Map
+
+### Weakset
+
+### Weakmap
 
 ## Async and Promises
 
