@@ -642,6 +642,29 @@ let b = new Basketball()
 
 ### Set
 
+```js
+let s = new Set()
+s.add({})
+s.add({})
+s.add(null)
+s.add(undefined)
+
+for (let [key, value] of s.entries()) console.log(key,value)
+> {} {}
+> {} {}
+
+let s1 = new Set([1, 2, 3, 4]);
+let s2 = new Set([2, 4, 6, 8, 9]);
+let intersection = new Set([...s1].filter(x => s2.has(x)));
+intersection
+> Set(2) {2, 4}
+let difference = new Set([...s1].filter(x => !s2.has(x)));
+difference
+> Set(2) {1, 3}
+
+
+```
+
 ### Map
 
 ### Weakset
