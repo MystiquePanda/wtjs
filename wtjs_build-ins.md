@@ -970,5 +970,3 @@ BigUint64Array
 # Internationlization
 # WebAssembly
 
-```
-
