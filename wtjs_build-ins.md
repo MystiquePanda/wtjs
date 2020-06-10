@@ -600,6 +600,12 @@ function longestString() {
 > 0
 (function(a = 1, b, c) {}).length
 > 0
+
+Symbol('unique') === Symbol('unique')
+> false
+Symbol.for('common') === Symbol.for('common')
+> true
+
 ```
 
 #### Instance methods (Function.prototype)
@@ -669,11 +675,6 @@ obj[Object(sym)]
 
 
 ```js
-Symbol('unique') === Symbol('unique')
-> false
-Symbol.for('common') === Symbol.for('common')
-> true
-
 Symbol.keyFor(Symbol.for('common'))
 > "common"
 ```
