@@ -809,9 +809,9 @@ BigInt.asUintN(64, max+1n)
 ```
 
 A BigInt behaves like a Number in cases where:
--converted to a Boolean: via the Boolean function;
--logical operators ||, &&, and !; or
--conditional test ie. if
+- converted to a Boolean: via the Boolean function;
+- logical operators ||, &&, and !; or
+- conditional test ie. if
 
 ```js
 JSON.stringify(BigInt(1)) 
@@ -820,6 +820,7 @@ BigInt.prototype.toJSON = function() { return this.toString()  }
 JSON.stringify(BigInt(1)) 
 > ""1""
 ```
+
 ### Math
 
 *Math works with the Number type. It doesn't work with BigInt*
@@ -925,8 +926,8 @@ d.toLocaleString('de-DE', options)
 
 ```js
 let r = /ab+c/i;
-new RegExp(/ab+c/, 'i') // literal notation
-new RegExp('ab+c', 'i') // constructor
+let rr = new RegExp(/ab+c/, 'i') // literal notation
+let rrr = new RegExp('ab+c', 'i') // constructor
 [typeof r,Object.getPrototypeOf(r).constructor.name]
 > ["object", "RegExp"]
 
@@ -940,11 +941,142 @@ text.split(/\r\n|\r|\n/)
 let url = 'http://mysub.domain.com'
 /[^.]+/.exec(url)[0].substr(7)
 > "mysub"
+
+// special array as output
+// RegExp.exec(), String.match(), and String.replace()
+let r = /d(b+)(d)/i;
+let res = r.exec('cdbBdbsbz')
+> (3) ["dbBd", "bB", "d", index: 1, input: "cdbBdbsbz", groups: undefined]
 ```
 
 # Collections
 
 ### Array
+
+#### Static methods
+
+if it quacks (a value) looks like a duck (an array) then it is a duck (an array)
+
+```js
+Array.isArray(new Int8Array())
+> false
+
+// isArray Polyfill
+if (!Array.isArray) {
+  Array.isArray = function(arg) {
+    return Object.prototype.toString.call(arg) === '[object Array]';
+  };
+}
+
+let arrLike = {v:[1,2,3],[Symbol.iterator]:function*(){yield*this.v}
+Array.from(arrLike,x=>x+x)
+> [2, 4, 6]
+
+Array.of(1, 2, 3, undefined);
+> [1, 2, 3, undefined]
+```
+
+#### Instance Method and properties 
+
+```js
+let arr = [...Array(5).keys()]
+arr.length=10
+> (10) [0, 1, 2, 3, 4, empty × 5]
+arr.length = 3
+> (3) [0, 1, 2]
+```
+
+
+| instance method | output | note | 
+| --- | --- | --- |
+| .map((item, index, array)=>{}),this) | Array |  | 
+| .every((item, index, array)=>{})) | boolean | |
+| .some((item, index, array)=>{},this) | boolean | |
+| .filter((item, index, array)=>{},this) | Array | |
+| .forEach(item, index, array)=>{},this) | void |  | 
+| .reduce((accu, item, index, array)=>{},initAccu)| accu | Array[0] = initAccu if not provided, when initAccu isn't provided, iteration is called one less time than otherwise,excluding holes | 
+| .reduceRight((accu, item, index, array)=>{},initAccu) | accu | excluding holes| 
+* exlucde holes during iteration (include undefined)
+* range of iteration is established on first call, changes to the array during iteration is ignored
+
+```js
+[1,3,,'last'].forEach((e) => {
+  console.log(e);
+})
+> 1
+> 3
+> last
+
+// only sync. callbacks
+let arr = [5, 4, 100];
+let sum = 0;
+let sumFunction = async (a, b) => a+b
+arr.forEach(async (r) => sum = await sumFunction(sum, r)
+)
+sum
+> 0
+
+[{x:22},{x:42},{x:-100}].map( e => e.x )
+.reduce(( max,cur) => Math.max( max, cur), -Infinity );
+> 42
+
+[100,"abc",new  Boolean(false)].some(x=>!x)
+> false
+
+let arr = [1,2,3];
+arr.some((c,i,a)=>{
+a.push(101);
+return c>100})
+> false
+[1,2,undefined,3].some((x)=>{typeof x === "undefined"})
+> false
+
+let arr = [5, 4, 7, 11, 2, 6]
+arr.filter( (e, index, arr) => {
+  console.log(arr)
+  arr.pop()
+  return e < 6
+})
+```
+
+*back*: .pop() , .push()
+*front*: .shift(), .unshift()
+*by index*: .splice(pos, n)
+*shallow copy*: fruits.slice()
+
+
+```js
+['a', 'b', 'c'].concat(1, [2, 3]);
+> ["a", "b", "c", 1, 2, 3]
+
+//works like memmove
+[1, 2, 3, 4, 5].copyWithin(-4)
+> [1, 2, 3, 1, 2]
+[1, 2, 3, 4, 5].copyWithin(0, 3)
+> [4, 5, 3, 4, 5]
+[1, 2, 3, 4, 5].copyWithin(0, 3, 4)
+> [4, 2, 3, 4, 5]
+[1, 2, 3, 4, 5].copyWithin(-2, -3
+> [1, 2, 3, 3, 4]
+[].copyWithin.call({length: 5, 3: 1}, 0, 3)
+> {0: 1, 3: 1, length: 5}
+
+
+[1, 2, 3].fill(4, -3, -2)
+> [4, 2, 3]
+[1, 2, 3].fill(4, 3, 5)
+> [1, 2, 3]
+Array(3).fill(4)
+> [4, 4, 4]
+[].fill.call({ length: 3 }, 4)
+> {0: 4, 1: 4, 2: 4, length: 3}
+let arr = Array(3).fill({})
+arr[0].clone = "hi"
+> [{ clone: "hi" }, { clone: "hi" }, { clone: "hi" }]
+
+[1, 2, NaN].includes(NaN) 
+> true
+```
 
 
 
