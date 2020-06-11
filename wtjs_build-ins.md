@@ -230,9 +230,9 @@ when used on objects, same Symbol.toPrimitive, toString(), valueOf() rules apply
 
 ### Object
 
-#### Object Creation
+#### Creation
 
-Object constructor rules
+Object constructor rules:
 1. new Object(null|undefined) => empty object
 2. return object of a given type
 3. if the value is an object, it will return the value
@@ -1113,9 +1113,27 @@ insertion order are perserved
 let m = new Map();
 m['random'] = false;
 m.set('random',true);
+m.set(NaN,"notANumber")
+m.set(undefined,"undef")
+m.set(null,"hasValue?")
+m.set(Symbol.for("special"),true)
+[m.get(NaN),m.get(undefined),m.get(null),m.get(Symbol.for("special"))]
+>  ["notANumber", "undef", "hasValue?", true]
+m.get(Number("broken"))
+> "notANumber"
 
 
+m.size=1;
+m.size
+> 0
 
+let original = new Map([[1, 'one']])
+let clone = new Map(original)
+original === clone
+> flase
+original.set(1,'hundred')
+clone.get(1)
+> "one"
 ```
 
 # Structured Data
