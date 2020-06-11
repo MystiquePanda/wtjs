@@ -984,6 +984,11 @@ arr.length=10
 > (10) [0, 1, 2, 3, 4, empty × 5]
 arr.length = 3
 > (3) [0, 1, 2]
+
+let holey = ['Hello']
+holey[99] = 'world';
+holey.length
+> 100
 ```
 
 
@@ -994,18 +999,21 @@ arr.length = 3
 | .some((item, index, array)=>{},this) | boolean | |
 | .filter((item, index, array)=>{},this) | Array | |
 | .forEach(item, index, array)=>{},this) | void |  | 
+| .find(item, index, array)=>{},this) | item |  | 
+| .findIndex(item, index, array)=>{},this) | void |  | 
 | .reduce((accu, item, index, array)=>{},initAccu)| accu | Array[0] = initAccu if not provided, when initAccu isn't provided, iteration is called one less time than otherwise,excluding holes | 
 | .reduceRight((accu, item, index, array)=>{},initAccu) | accu | excluding holes| 
-* exlucde holes during iteration (include undefined)
-* range of iteration is established on first call, changes to the array during iteration is ignored
+
 
 ```js
-[1,3,,'last'].forEach((e) => {
+// skip exclude holes(empty) during iteration 
+[1,3,,'last',undefined].forEach((e) => {
   console.log(e);
 })
 > 1
 > 3
 > last
+> undefined
 
 // only sync. callbacks
 let arr = [5, 4, 100];
@@ -1016,20 +1024,12 @@ arr.forEach(async (r) => sum = await sumFunction(sum, r)
 sum
 > 0
 
-[{x:22},{x:42},{x:-100}].map( e => e.x )
-.reduce(( max,cur) => Math.max( max, cur), -Infinity );
-> 42
-
-[100,"abc",new  Boolean(false)].some(x=>!x)
-> false
-
+// iteration scope, defined on first iteration
 let arr = [1,2,3];
-arr.some((c,i,a)=>{
+arr.map((c,i,a)=>{
 a.push(101);
 return c>100})
-> false
-[1,2,undefined,3].some((x)=>{typeof x === "undefined"})
-> false
+> (3) [false, false, false]
 
 let arr = [5, 4, 7, 11, 2, 6]
 arr.filter( (e, index, arr) => {
@@ -1037,13 +1037,31 @@ arr.filter( (e, index, arr) => {
   arr.pop()
   return e < 6
 })
+
+let arr = [5, 4, 7, 11, 2, 6]
+arr.filter( (e, i, arr) => {
+  arr[Math.min(i+1,arr.length-1)]+=10
+  console.log(arr)
+  return e < 6
+})
+
+[{x:22},{x:42},{x:-100}].map( e => e.x )
+.reduce(( max,cur) => Math.max( max, cur), -Infinity );
+> 42
+
+[100,"abc",new  Boolean(false)].some(x=>!x)
+> false
+
+[1,2,undefined,3].some((x)=>{typeof x === "undefined"})
+> false
+
 ```
 
 *back*: .pop() , .push()
 *front*: .shift(), .unshift()
 *by index*: .splice(pos, n)
 *shallow copy*: fruits.slice()
-
+*search*: .indexOf(), lastIndexOf()
 
 ```js
 ['a', 'b', 'c'].concat(1, [2, 3]);
@@ -1078,9 +1096,6 @@ arr[0].clone = "hi"
 > true
 ```
 
-
-
-
 #### Uniform Typed Array
 
 Int8Array
@@ -1096,6 +1111,9 @@ BigInt64Array
 BigUint64Array
 
 ### Map
+
+
+
 
 # Structured Data
 # Reflection
