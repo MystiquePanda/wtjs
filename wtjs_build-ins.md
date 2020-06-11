@@ -1098,22 +1098,25 @@ arr[0].clone = "hi"
 
 #### Uniform Typed Array
 
-Int8Array
-Uint8Array
-Uint8ClampedArray
-Int16Array
-Uint16Array
-Int32Array
-Uint32Array
-Float32Array
-Float64Array
-BigInt64Array
-BigUint64Array
+- Int8Array, Uint8Array, Uint8ClampedArray
+- Int16Array, Uint16Array
+- Int32Array, Uint32Array
+- Float32Array, Float64Array
+- BigInt64Array, BigUint64Array
 
 ### Map
 
+#ES2015 
+insertion order are perserved
+
+```js
+let m = new Map();
+m['random'] = false;
+m.set('random',true);
 
 
+
+```
 
 # Structured Data
 # Reflection
