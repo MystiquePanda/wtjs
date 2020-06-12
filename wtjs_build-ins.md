@@ -1181,25 +1181,66 @@ ws.add({})
 *Use case*: Detecting circular references
 ```js
 function execRecursively(fn, subject, _refs = null){
-	if(!_refs)
-		_refs = new WeakSet();
+  if(!_refs)
+    _refs = new WeakSet();
 	
-	// Avoid infinite recursion
-	if(_refs.has(subject))
-		return;
+  // Avoid infinite recursion
+  if(_refs.has(subject))
+    return;
 
-	fn(subject);
-	if("object" === typeof subject){
-		_refs.add(subject);
-		for(let key in subject)
-			execRecursively(fn, subject[key], _refs);
-	}
+  fn(subject);
+  if("object" === typeof subject){
+    _refs.add(subject);
+    for(let key in subject)
+      execRecursively(fn, subject[key], _refs);
+  }
 }
+
+*Use case*: Hide Implementation
+```js
+const privates = new WeakMap();
+
+function Public() {
+  const me = {
+    // Private data goes here
+  };
+  privates.set(this, me);
+}
+
+Public.prototype.method = function () {
+  const me = privates.get(this);
+  // Do stuff with private data in `me`...
+};
+
+module.exports = Public;
 ```
+
 
 # Control abstraction objects
 
 ### Promise
+
+State of Promise:
+- pending: initial state, neither fulfilled nor rejected.
+- fulfilled: meaning that the operation completed successfully.
+- rejected: meaning that the operation failed.
+
+| | | |
+| --- | --- |
+| .then(success, fail) | 
+| .catch(error) | same as .then(null,fail)
+| .finally() |
+
+When a Promise fails one of the two events (type: PromiseRejectionEvent) are sent to global scope
+- rejectionhandled
+- unhandledrejection
+
+```js
+window.onunhandledrejection = e => console.log("globally heard a unhandled rejection from promise ",e)
+window.onrejectionhandled = e => console.log("globally heard a rejection from promise ",e)
+```
+
+#### Static methods
 
 
 ### Generator
