@@ -1107,7 +1107,7 @@ arr[0].clone = "hi"
 ### Map
 
 #ES2015 
-insertion order are perserved
+insertion order are perserved when iterating
 
 ```js
 let m = new Map();
@@ -1127,18 +1127,92 @@ m.size=1;
 m.size
 > 0
 
-let original = new Map([[1, 'one']])
+let original = new Map([[1, {id:'one'}]])
 let clone = new Map(original)
 original === clone
 > flase
-original.set(1,'hundred')
+original.get(1)["name"]='one'
 clone.get(1)
-> "one"
+> {id: "one", name: "one"}
+
+
+let first = new Map([
+  [1, 'one'],
+  [2, 'two'],
+  [3, 'three'],
+])
+let second = new Map([
+  [1, 'uno'],
+  [2, 'dos']
+])
+new Map([...first, ...second, [1, 'eins']])
+> Map(3) {1 => "eins", 2 => "dos", 3 => "three"}
+
 ```
+
+### Set
+
+```js
+(new Set([NaN,undefined,null,,NaN])).has(NaN)
+> true
+```
+
+### WeakMap 
+
+```js
+let wm = new WeakMap()
+wm.set(1,"one")
+> Uncaught TypeError: Invalid value used as weak map key
+wm.set(globalThis, 1)
+> WeakMap {Window => 1}
+
+```
+
+### WeakSet
+
+```js
+let ws = new WeakSet();
+ws.add(1);
+> Uncaught TypeError: Invalid value used in weak set
+ws.add({})
+> WeakSet {{}}
+```
+
+*Use case*: Detecting circular references
+```js
+function execRecursively(fn, subject, _refs = null){
+	if(!_refs)
+		_refs = new WeakSet();
+	
+	// Avoid infinite recursion
+	if(_refs.has(subject))
+		return;
+
+	fn(subject);
+	if("object" === typeof subject){
+		_refs.add(subject);
+		for(let key in subject)
+			execRecursively(fn, subject[key], _refs);
+	}
+}
+```
+
+# Control abstraction objects
+
+### Promise
+
+
+### Generator
+
+
+### GeneratorFunction
+
+
+### AsyncFunction
+
 
 # Structured Data
 # Reflection
-# Control abstraction objects
 # Internationlization
 # WebAssembly
 
