@@ -1220,6 +1220,8 @@ module.exports = Public;
 
 ### Promise
 
+Callbacks inside-out
+
 ```js
 let pp = new Promise(
  (fulfilledCB,rejectedCB)=>{
@@ -1238,11 +1240,16 @@ State of Promise:
 | .finally() | |
 
 ```js
+Promise.reject()
+  .then(() => 100, () => -100)
+  .then(solution => console.log('Resolved with ' + solution))
+> Resolved with -100
+
 // doens't error even when CB aren't valid
 Promise.resolve().then({jibberish:true})
 > Promise {<resolved>: undefined}
 
-
+// async execution
 let resolvedProm = Promise.resolve(33);
 let thenProm = resolvedProm.then(value => {
     console.log("called after the end of the main stack. the value received and returned is: " + value);
@@ -1257,6 +1264,7 @@ console.log("instant",thenProm);
 > called at the end of the main stack. the value received and returned is: 33
 > postponed Promise {<resolved>: 33}
 
+// async execution
 Promise.resolve('dinosaurs')
   .then(s=>{
     return new Promise(function(res, rej) {
@@ -1281,6 +1289,20 @@ Promise {<pending>}
 > Listen! 
 > fact: dinosaurs rule
 > misconception:  dinosaurs ruled
+
+//order matters with exception handling
+Promise.resolve()
+  .then(() => {
+    throw new Error('Kaboom!');
+  })
+  .catch(e => {
+    console.error('Fire!Fire!  ' + e.message);
+  })
+  .then(() => {
+    console.log("Looks like all good now");
+  });
+> Fire!Fire!  Kaboom!
+> Looks like all good now
 
 
 /* returns another pending promise object, the resolution/rejection of the promise returned by then will be subsequent to the resolution/rejection of the promise returned by the handler */
