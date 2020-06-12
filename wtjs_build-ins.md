@@ -1220,16 +1220,80 @@ module.exports = Public;
 
 ### Promise
 
+```js
+let pp = new Promise(
+ (fulfilledCB,rejectedCB)=>{
+    setTimeout(()=>{ rejectedCB();console.log("done")}, 3000);})
+/*depends on which call back is called, the state of promise will change.*/
+```
 State of Promise:
-- pending: initial state, neither fulfilled nor rejected.
-- fulfilled: meaning that the operation completed successfully.
-- rejected: meaning that the operation failed.
+- pending: initial state
+- fulfilled: operation completed successfully -  "resolved"
+- rejected: operation failed.
 
-| | | |
+| Method | Description |
 | --- | --- |
-| .then(success, fail) | 
-| .catch(error) | same as .then(null,fail)
-| .finally() |
+| .then(fulfilledCB[, rejectedCB]) | fulfilledCB(value), rejectedCB(reason) called asynchronously| 
+| .catch(error) | same as .then(null,fail) |
+| .finally() | |
+
+```js
+// doens't error even when CB aren't valid
+Promise.resolve().then({jibberish:true})
+> Promise {<resolved>: undefined}
+
+
+let resolvedProm = Promise.resolve(33);
+let thenProm = resolvedProm.then(value => {
+    console.log("called after the end of the main stack. the value received and returned is: " + value);
+    return value;
+});
+// postpone the execution to when the stack is empty
+let t = setTimeout(() => {
+    console.log("postponed",thenProm);
+});
+console.log("instant",thenProm);
+> instant Promise {<pending>}
+> called at the end of the main stack. the value received and returned is: 33
+> postponed Promise {<resolved>: 33}
+
+Promise.resolve('dinosaurs')
+  .then(s=>{
+    return new Promise(function(res, rej) {
+      setTimeout(function() {
+        s += ' rule';
+        res(s);
+      }, 1);
+    });
+  })
+  .then(s=>{
+    setTimeout(function() {
+      s += 'd';
+      console.log("misconception: ",s);
+    }, 1)
+    return s;
+  }) 
+  .then(s=>{
+    console.log("Listen! ");
+    console.log("fact:",s);
+  });
+Promise {<pending>}
+> Listen! 
+> fact: dinosaurs rule
+> misconception:  dinosaurs ruled
+
+
+/* returns another pending promise object, the resolution/rejection of the promise returned by then will be subsequent to the resolution/rejection of the promise returned by the handler */
+let rej = Promise.reject();
+let p = new Promise((s,r)=>{setInterval(s,1000)}).then(s=>{return rej},r=>{})
+p
+> Promise {<rejected>: undefined}
+
+
+
+```
+
+#### Error
 
 When a Promise fails one of the two events (type: PromiseRejectionEvent) are sent to global scope
 - rejectionhandled
@@ -1238,6 +1302,12 @@ When a Promise fails one of the two events (type: PromiseRejectionEvent) are sen
 ```js
 window.onunhandledrejection = e => console.log("globally heard a unhandled rejection from promise ",e)
 window.onrejectionhandled = e => console.log("globally heard a rejection from promise ",e)
+let p = new Promise((s,r)=>{r("no good reason")}).then(()=>{console.log("this won't print")})
+> globally heard a unhandled rejection from promise  PromiseRejectionEvent {isTrusted: true, promise: Promise, reason: "no good reason", type: "unhandledrejection", target: Window, …}
+
+/*TODO can't seem to generate rejectionhandled*/
+let p = new Promise((s,r)=>{r("no good reason")}).catch((e)=>{console.log("this will print")})
+> this will print
 ```
 
 #### Static methods
