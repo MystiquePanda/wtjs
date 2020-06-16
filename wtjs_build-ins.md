@@ -1007,9 +1007,7 @@ holey.length
 
 ```js
 // skip exclude holes(empty) during iteration 
-[1,3,,'last',undefined].forEach((e) => {
-  console.log(e);
-})
+[1,3,,'last',undefined].forEach((e) => console.log(e))
 > 1
 > 3
 > last
@@ -1019,8 +1017,7 @@ holey.length
 let arr = [5, 4, 100];
 let sum = 0;
 let sumFunction = async (a, b) => a+b
-arr.forEach(async (r) => sum = await sumFunction(sum, r)
-)
+arr.forEach(async (r) => sum = await sumFunction(sum, r))
 sum
 > 100
 
@@ -1223,7 +1220,7 @@ Callbacks inside-out
 let pp = new Promise(
  (fulfilledCB,rejectedCB)=>{
     setTimeout(()=>{ rejectedCB();console.log("done")}, 3000);})
-/*depends on which call back is called, the state of promise will change.*/
+/*depends on which callback is called, the state of promise will change.*/
 ```
 State of Promise:
 - pending: initial state
@@ -1242,7 +1239,7 @@ Promise.reject()
   .then(solution => console.log('Resolved with ' + solution))
 > Resolved with -100
 
-// doens't error even when CB aren't valid
+// doesn't error even when CB aren't valid
 Promise.resolve().then({jibberish:true})
 > Promise {<resolved>: undefined}
 
@@ -1252,6 +1249,7 @@ let thenProm = resolvedProm.then(value => {
     console.log("called after the end of the main stack. the value received and returned is: " + value);
     return value;
 });
+
 // postpone the execution to when the stack is empty
 let t = setTimeout(() => {
     console.log("postponed",thenProm);
@@ -1335,15 +1333,101 @@ let p3 = new Promise((resolve, reject) => {
   setTimeout(() => {
     console.log("done with p3")
     resolve("tres");
-  }, 5000);
+  }, 3000);
 }); 
-Promise.all([p1,p2,p3]).then(res =>console.log(res))
-> Promise {<pending>} // return value
+setTimeout(
+()=>{
+  console.log("stack is empty")
+  Promise.all([p1,p2,p3]).then(res =>console.log("async ", res))
+  Promise.all([]).then(res => console.log("empty itrator is sync"))
+  })
+> stack is empty
+> empty itrator is sync
 > done with p3
-> ["uno", "dos", "tres"]
+> async ["uno", "dos", "tres"]
 
+// Fast fail
+let p1 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('ten sec'), 10000); 
+}); 
+let p2 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('one sec'), 1000); 
+});
+let pf = new Promise((resolve, reject) => {
+  setTimeout(() => reject(new Error('reject, one.five sec')),1500);
+});
+Promise.all([p1, p2, pf])
+.then(v => console.log(v))
+.catch(e => console.error(e.message));
+> reject, one.five sec
 
+// catching fails 
+let p1 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('ten sec'), 10000); 
+}); 
+let p2 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('one sec'), 1000); 
+});
+let pf = new Promise((resolve, reject) => {
+  setTimeout(() => reject(new Error('reject, one.five sec')),1500);
+});
+Promise.all([p1,p2,pf.catch(e => e),]).then(values => { 
+  console.log(values[0]) // "p1_delayed_resolution"
+  console.log(values[1])
+  console.error(values[2]) // "Error: p2_immediate_rejection"
+})
+> ten sec
+> one sec
+> Error: reject, one.five sec
+    
+    
+let p1 = Promise.resolve("uno");
+let p2 = "dos";
+let p3 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    console.log("done with p3")
+    resolve("tres");
+  }, 3000);
+}); 
+setTimeout(
+()=>{
+  console.log("stack is empty")
+  Promise.allSettled([p1,p2,p3]).then(res =>console.log("async ", res))
+  })
+> stack is empty
+> done with p3
+> 0: {status: "fulfilled", value: "uno"}
+> 1: {status: "fulfilled", value: "dos"}
+> 2: {status: "fulfilled", value: "tres"}
 
+let p1 = new Promise((s,r) => setTimeout(s, 500, 'one'))
+let p2 = new Promise((s,r) => setTimeout(s, 1000, 'two'))
+Promise.race([p1, p2]).then(v => console.log(v));
+> one
+
+let p1 = new Promise((s,r) => s("one"))
+let p2 = new Promise((s,r) => setTimeout(s, 1000, 'two'))
+Promise.race([p1, p2]).then(v => console.log(v));
+> one
+
+Promise.race([]).then(v => console.log(v));
+> Promise {<pending>}
+
+let forever = Promise.race([]);
+let fulfilled = Promise.resolve(100);
+
+let p = Promise.race([forever, fulfilled, "non-Promise value"]);
+let p2 = Promise.race([forever, "non-Promise value", fulfilled]);
+console.log([p,p2]);
+setTimeout(function(){
+    console.log('the stack is now empty');
+    console.log("p: ", p);
+    console.log("p2: ", p2);
+});
+> [Promise {<pending>},Promise {<pending>}]
+> the stack is now empty
+> p:  Promise {<resolved>: 100}
+> p2:  Promise {<resolved>: "non-Promise value"}
 
 ```
 
