@@ -1052,8 +1052,8 @@ arr.filter( (e, i, arr) => {
 [100,"abc",new  Boolean(false)].some(x=>!x)
 > false
 
-[1,2,undefined,3].some((x)=>{typeof x === "undefined"})
-> false
+[1,2,undefined,3].some((x)=>{return typeof x === "undefined"})
+> true
 
 ```
 
@@ -1122,10 +1122,9 @@ m.set(Symbol.for("special"),true)
 m.get(Number("broken"))
 > "notANumber"
 
-
 m.size=1;
 m.size
-> 0
+> 5
 
 let original = new Map([[1, {id:'one'}]])
 let clone = new Map(original)
@@ -1165,7 +1164,24 @@ wm.set(1,"one")
 > Uncaught TypeError: Invalid value used as weak map key
 wm.set(globalThis, 1)
 > WeakMap {Window => 1}
+```
+*Use case*: Hide Implementation
+```js
+const privates = new WeakMap();
 
+function Public() {
+  const me = {
+    // Private data goes here
+  };
+  privates.set(this, me);
+}
+
+Public.prototype.method = function () {
+  const me = privates.get(this);
+  // Do stuff with private data in `me`...
+};
+
+module.exports = Public;
 ```
 
 ### WeakSet
@@ -1196,24 +1212,6 @@ function execRecursively(fn, subject, _refs = null){
   }
 }
 
-*Use case*: Hide Implementation
-```js
-const privates = new WeakMap();
-
-function Public() {
-  const me = {
-    // Private data goes here
-  };
-  privates.set(this, me);
-}
-
-Public.prototype.method = function () {
-  const me = privates.get(this);
-  // Do stuff with private data in `me`...
-};
-
-module.exports = Public;
-```
 
 
 # Control abstraction objects
@@ -1310,9 +1308,6 @@ let rej = Promise.reject();
 let p = new Promise((s,r)=>{setInterval(s,1000)}).then(s=>{return rej},r=>{})
 p
 > Promise {<rejected>: undefined}
-
-
-
 ```
 
 #### Error
@@ -1334,6 +1329,10 @@ let p = new Promise((s,r)=>{r("no good reason")}).catch((e)=>{console.log("this 
 
 #### Static methods
 
+```js
+Promise.all(iterable)
+
+```
 
 ### Generator
 
