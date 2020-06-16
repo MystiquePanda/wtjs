@@ -1022,7 +1022,7 @@ let sumFunction = async (a, b) => a+b
 arr.forEach(async (r) => sum = await sumFunction(sum, r)
 )
 sum
-> 0
+> 100
 
 // iteration scope, defined on first iteration
 let arr = [1,2,3];
@@ -1033,17 +1033,19 @@ return c>100})
 
 let arr = [5, 4, 7, 11, 2, 6]
 arr.filter( (e, index, arr) => {
-  console.log(arr)
+  //console.log(arr)
   arr.pop()
   return e < 6
 })
+> [5,4]
 
 let arr = [5, 4, 7, 11, 2, 6]
 arr.filter( (e, i, arr) => {
   arr[Math.min(i+1,arr.length-1)]+=10
-  console.log(arr)
+  //console.log(arr)
   return e < 6
 })
+> [5]
 
 [{x:22},{x:42},{x:-100}].map( e => e.x )
 .reduce(( max,cur) => Math.max( max, cur), -Infinity );
@@ -1051,9 +1053,6 @@ arr.filter( (e, i, arr) => {
 
 [100,"abc",new  Boolean(false)].some(x=>!x)
 > false
-
-[1,2,undefined,3].some((x)=>{return typeof x === "undefined"})
-> true
 
 ```
 
@@ -1080,12 +1079,12 @@ arr.filter( (e, i, arr) => {
 > {0: 1, 3: 1, length: 5}
 
 
-[1, 2, 3].fill(4, -3, -2)
-> [4, 2, 3]
-[1, 2, 3].fill(4, 3, 5)
-> [1, 2, 3]
-Array(3).fill(4)
-> [4, 4, 4]
+[1, 2, 3, 4, 5].fill(4, -3, -1)
+> [1, 2, 4, 4, 5]
+[1, 2, 3, 4, 5].fill(4, 3, 6)
+> [1, 2, 3, 4, 4]
+Array(5).fill(4)
+> [4, 4, 4, 4, 4]
 [].fill.call({ length: 3 }, 4)
 > {0: 4, 1: 4, 2: 4, length: 3}
 let arr = Array(3).fill({})
@@ -1330,7 +1329,21 @@ let p = new Promise((s,r)=>{r("no good reason")}).catch((e)=>{console.log("this 
 #### Static methods
 
 ```js
-Promise.all(iterable)
+let p1 = Promise.resolve("uno");
+let p2 = "dos";
+let p3 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    console.log("done with p3")
+    resolve("tres");
+  }, 5000);
+}); 
+Promise.all([p1,p2,p3]).then(res =>console.log(res))
+> Promise {<pending>} // return value
+> done with p3
+> ["uno", "dos", "tres"]
+
+
+
 
 ```
 
