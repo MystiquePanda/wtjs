@@ -16,6 +16,7 @@
   * [Set](#set)
   * [Map](#map)
   * [Weakset](#weakset)
+  * [Weakmap](#weakmap)
 - [Async and Promises](#async-and-promises)
   * [Promise](#promise)
     + [Error](#error)
@@ -750,6 +751,7 @@ function execRecursively(fn, subject, _refs = null){
 }
 
 ### Weakmap
+
 ```js
 let wm = new WeakMap()
 wm.set(1,"one")
