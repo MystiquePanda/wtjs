@@ -7,11 +7,24 @@
 - [Math & Number feature](#math---number-feature)
     + [Trigonometric Methods](#trigonometric-methods)
 - [Arrow function](#arrow-function)
-- [new data structures](#new-data-structures)
 - [Class & Inheritance](#class---inheritance)
+  * [Object member](#object-member)
+  * [This and class declaration](#this-and-class-declaration)
+  * [Inheritance](#inheritance)
+  * [Mix-ins](#mix-ins)
+- [new data structures](#new-data-structures)
+  * [Set](#set)
+  * [Map](#map)
+  * [Weakset](#weakset)
 - [Async and Promises](#async-and-promises)
+  * [Promise](#promise)
+    + [Error](#error)
+    + [Static methods](#static-methods)
+  * [AsyncFunction](#asyncfunction)
+- [Proxy and Reflect](#proxy-and-reflect)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 
 ## var vs. let
@@ -662,16 +675,421 @@ let difference = new Set([...s1].filter(x => !s2.has(x)));
 difference
 > Set(2) {1, 3}
 
-
+(new Set([NaN,undefined,null,,NaN])).has(NaN)
+> true
 ```
 
 ### Map
+insertion order are perserved when iterating
+
+```js
+let m = new Map();
+m['random'] = false;
+m.set('random',true);
+m.set(NaN,"notANumber")
+m.set(undefined,"undef")
+m.set(null,"hasValue?")
+m.set(Symbol.for("special"),true)
+[m.get(NaN),m.get(undefined),m.get(null),m.get(Symbol.for("special"))]
+>  ["notANumber", "undef", "hasValue?", true]
+m.get(Number("broken"))
+> "notANumber"
+
+m.size=1;
+m.size
+> 5
+
+let original = new Map([[1, {id:'one'}]])
+let clone = new Map(original)
+original === clone
+> flase
+original.get(1)["name"]='one'
+clone.get(1)
+> {id: "one", name: "one"}
+
+
+let first = new Map([
+  [1, 'one'],
+  [2, 'two'],
+  [3, 'three'],
+])
+let second = new Map([
+  [1, 'uno'],
+  [2, 'dos']
+])
+new Map([...first, ...second, [1, 'eins']])
+> Map(3) {1 => "eins", 2 => "dos", 3 => "three"}
+
+```
 
 ### Weakset
+```js
+let ws = new WeakSet();
+ws.add(1);
+> Uncaught TypeError: Invalid value used in weak set
+ws.add({})
+> WeakSet {{}}
+```
+
+*Use case*: Detecting circular references
+```js
+function execRecursively(fn, subject, _refs = null){
+  if(!_refs)
+    _refs = new WeakSet();
+	
+  // Avoid infinite recursion
+  if(_refs.has(subject))
+    return;
+
+  fn(subject);
+  if("object" === typeof subject){
+    _refs.add(subject);
+    for(let key in subject)
+      execRecursively(fn, subject[key], _refs);
+  }
+}
 
 ### Weakmap
+```js
+let wm = new WeakMap()
+wm.set(1,"one")
+> Uncaught TypeError: Invalid value used as weak map key
+wm.set(globalThis, 1)
+> WeakMap {Window => 1}
+```
+*Use case*: Hide Implementation
+```js
+const privates = new WeakMap();
+
+function Public() {
+  const me = {
+    // Private data goes here
+  };
+  privates.set(this, me);
+}
+
+Public.prototype.method = function () {
+  const me = privates.get(this);
+  // Do stuff with private data in `me`...
+};
+
+module.exports = Public;
+```
+
 
 ## Async and Promises
+
+### Promise
+
+Callbacks inside-out
+
+```js
+let pp = new Promise(
+ (fulfilledCB,rejectedCB)=>{
+    setTimeout(()=>{ rejectedCB();console.log("done")}, 3000);})
+/*depends on which callback is called, the state of promise will change.*/
+```
+State of Promise:
+- pending: initial state
+- fulfilled: operation completed successfully -  "resolved"
+- rejected: operation failed.
+
+| Method | Description |
+| --- | --- |
+| .then(fulfilledCB[, rejectedCB]) | fulfilledCB(value), rejectedCB(reason) called asynchronously| 
+| .catch(error) | same as .then(null,fail) |
+| .finally() | |
+
+```js
+Promise.reject()
+  .then(() => 100, () => -100)
+  .then(solution => console.log('Resolved with ' + solution))
+> Resolved with -100
+
+// doesn't error even when CB aren't valid
+Promise.resolve().then({jibberish:true})
+> Promise {<resolved>: undefined}
+
+// async execution
+let resolvedProm = Promise.resolve(33);
+let thenProm = resolvedProm.then(value => {
+    console.log("called after the end of the main stack. the value received and returned is: " + value);
+    return value;
+});
+
+// postpone the execution to when the stack is empty
+let t = setTimeout(() => {
+    console.log("postponed",thenProm);
+});
+console.log("instant",thenProm);
+> instant Promise {<pending>}
+> called at the end of the main stack. the value received and returned is: 33
+> postponed Promise {<resolved>: 33}
+
+// async execution
+Promise.resolve('dinosaurs')
+  .then(s=>{
+    return new Promise(function(res, rej) {
+      setTimeout(function() {
+        s += ' rule';
+        res(s);
+      }, 1);
+    });
+  })
+  .then(s=>{
+    setTimeout(function() {
+      s += 'd';
+      console.log("misconception: ",s);
+    }, 1)
+    return s;
+  }) 
+  .then(s=>{
+    console.log("Listen! ");
+    console.log("fact:",s);
+  });
+Promise {<pending>}
+> Listen! 
+> fact: dinosaurs rule
+> misconception:  dinosaurs ruled
+
+//order matters with exception handling
+Promise.resolve()
+  .then(() => {
+    throw new Error('Kaboom!');
+  })
+  .catch(e => {
+    console.error('Fire!Fire!  ' + e.message);
+  })
+  .then(() => {
+    console.log("Looks like all good now");
+  });
+> Fire!Fire!  Kaboom!
+> Looks like all good now
+
+
+/* returns another pending promise object, the resolution/rejection of the promise returned by then will be subsequent to the resolution/rejection of the promise returned by the handler */
+let rej = Promise.reject();
+let p = new Promise((s,r)=>{setInterval(s,1000)}).then(s=>{return rej},r=>{})
+p
+> Promise {<rejected>: undefined}
+```
+
+#### Error
+
+When a Promise fails one of the two events (type: PromiseRejectionEvent) are sent to global scope
+- rejectionhandled
+- unhandledrejection
+
+```js
+window.onunhandledrejection = e => console.log("globally heard a unhandled rejection from promise ",e)
+window.onrejectionhandled = e => console.log("globally heard a rejection from promise ",e)
+let p = new Promise((s,r)=>{r("no good reason")}).then(()=>{console.log("this won't print")})
+> globally heard a unhandled rejection from promise  PromiseRejectionEvent {isTrusted: true, promise: Promise, reason: "no good reason", type: "unhandledrejection", target: Window, …}
+
+/*TODO can't seem to generate rejectionhandled*/
+let p = new Promise((s,r)=>{r("no good reason")}).catch((e)=>{console.log("this will print")})
+> this will print
+```
+
+#### Static methods
+
+```js
+let p1 = Promise.resolve("uno");
+let p2 = "dos";
+let p3 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    console.log("done with p3")
+    resolve("tres");
+  }, 3000);
+}); 
+setTimeout(
+()=>{
+  console.log("stack is empty")
+  Promise.all([p1,p2,p3]).then(res =>console.log("async ", res))
+  Promise.all([]).then(res => console.log("empty itrator is sync"))
+  })
+> stack is empty
+> empty itrator is sync
+> done with p3
+> async ["uno", "dos", "tres"]
+
+// Fast fail
+let p1 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('ten sec'), 10000); 
+}); 
+let p2 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('one sec'), 1000); 
+});
+let pf = new Promise((resolve, reject) => {
+  setTimeout(() => reject(new Error('reject, one.five sec')),1500);
+});
+Promise.all([p1, p2, pf])
+.then(v => console.log(v))
+.catch(e => console.error(e.message));
+> reject, one.five sec
+
+// catching fails 
+let p1 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('ten sec'), 10000); 
+}); 
+let p2 = new Promise((resolve, reject) => { 
+  setTimeout(() => resolve('one sec'), 1000); 
+});
+let pf = new Promise((resolve, reject) => {
+  setTimeout(() => reject(new Error('reject, one.five sec')),1500);
+});
+Promise.all([p1,p2,pf.catch(e => e),]).then(values => { 
+  console.log(values[0]) // "p1_delayed_resolution"
+  console.log(values[1])
+  console.error(values[2]) // "Error: p2_immediate_rejection"
+})
+> ten sec
+> one sec
+> Error: reject, one.five sec
+    
+    
+let p1 = Promise.resolve("uno");
+let p2 = "dos";
+let p3 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    console.log("done with p3")
+    resolve("tres");
+  }, 3000);
+}); 
+setTimeout(
+()=>{
+  console.log("stack is empty")
+  Promise.allSettled([p1,p2,p3]).then(res =>console.log("async ", res))
+  })
+> stack is empty
+> done with p3
+> 0: {status: "fulfilled", value: "uno"}
+> 1: {status: "fulfilled", value: "dos"}
+> 2: {status: "fulfilled", value: "tres"}
+
+let p1 = new Promise((s,r) => setTimeout(s, 500, 'one'))
+let p2 = new Promise((s,r) => setTimeout(s, 1000, 'two'))
+Promise.race([p1, p2]).then(v => console.log(v));
+> one
+
+let p1 = new Promise((s,r) => s("one"))
+let p2 = new Promise((s,r) => setTimeout(s, 1000, 'two'))
+Promise.race([p1, p2]).then(v => console.log(v));
+> one
+
+Promise.race([]).then(v => console.log(v));
+> Promise {<pending>}
+
+let forever = Promise.race([]);
+let fulfilled = Promise.resolve(100);
+
+let p = Promise.race([forever, fulfilled, "non-Promise value"]);
+let p2 = Promise.race([forever, "non-Promise value", fulfilled]);
+console.log([p,p2]);
+setTimeout(function(){
+    console.log('the stack is now empty');
+    console.log("p: ", p);
+    console.log("p2: ", p2);
+});
+> [Promise {<pending>},Promise {<pending>}]
+> the stack is now empty
+> p:  Promise {<resolved>: 100}
+> p2:  Promise {<resolved>: "non-Promise value"}
+```
+
+### AsyncFunction
+
+```js
+Object.getPrototypeOf(async function(){})
+> AsyncFunction {Symbol(Symbol.toStringTag): "AsyncFunction", constructor: ƒ}
+
+function after2Seconds() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('resolved');
+    }, 2000);
+  });
+}
+
+async function asyncCall() {
+  console.log('calling:');
+  const result = await after2Seconds();
+  console.log(result);
+}
+
+asyncCall();
+> calling:
+> resolved
+
+
+let f = (async () => (1))()
+f
+> Promise {<resolved>: 1}
+
+
+async function f() {
+ const result1 = await new Promise((resolve) => setTimeout(() => resolve('1'),3000))
+ console.log("result1: ",result1); 
+ const result2 = await new Promise((resolve) => setTimeout(() => resolve('2')))
+  console.log("result2: ",result2);
+}
+f()
+console.log("this is the end")
+
+> this is the end
+> result1:  1
+> result2:  2
+
+//use Promise.all or Promise.allSettled when dealing with multiple promise
+let f = async () => {
+   const p1 = new Promise((s) => setTimeout(() => s('1'), 2000))
+   const p2 = new Promise((_,r) => setTimeout(() => r('2'), 500))   
+   const results = [await p1, await p2]  
+}
+f().catch(() => {}) 
+> Promise {<pending>}
+// error will show up after p2 is resolved, before p1 is resolved
+
+// parallel execution
+let slow = () => {
+  console.log("start slow..");
+  return new Promise(s=>{setTimeout(()=>s("slow done"),3000)});
+}
+let fast = () => {
+  console.log("start fast..");
+  return new Promise(s=>{setTimeout(()=>s("fast done"),5000)});
+}
+let parallel = async () => {
+  await Promise.all([
+      (async()=>console.log(await slow()))(),
+      (async()=>console.log(await fast()))()
+  ])
+  console.log("all done")
+}
+```
+
+## Proxy and Reflect
+
+```js
+let target = {
+  notProx: "original",
+  prox: "original"
+};
+let handler = {
+  get: function(target, prop, receiver) {
+    if (prop === "prox") {
+      return "proxied";
+    }
+    return Reflect.get(...arguments);
+  }
+};
+
+const proxy = new Proxy(target, handler);
+console.log([proxy.notProx,proxy.prox]);
+> [original,proxied]
+```
+
+
 
 
 
