@@ -1428,20 +1428,102 @@ setTimeout(function(){
 > the stack is now empty
 > p:  Promise {<resolved>: 100}
 > p2:  Promise {<resolved>: "non-Promise value"}
-
 ```
 
 ### Generator
-
-
-### GeneratorFunction
+*see wtjs_ES2015*
 
 
 ### AsyncFunction
 
+```js
+Object.getPrototypeOf(async function(){})
+> AsyncFunction {Symbol(Symbol.toStringTag): "AsyncFunction", constructor: ƒ}
+
+function after2Seconds() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('resolved');
+    }, 2000);
+  });
+}
+
+async function asyncCall() {
+  console.log('calling:');
+  const result = await after2Seconds();
+  console.log(result);
+}
+
+asyncCall();
+> calling:
+> resolved
+
+
+let f = (async () => (1))()
+f
+> Promise {<resolved>: 1}
+
+
+async function f() {
+ const result1 = await new Promise((resolve) => setTimeout(() => resolve('1'),3000))
+ console.log("result1: ",result1); 
+ const result2 = await new Promise((resolve) => setTimeout(() => resolve('2')))
+  console.log("result2: ",result2);
+}
+f()
+console.log("this is the end")
+
+> this is the end
+> result1:  1
+> result2:  2
+
+//use Promise.all or Promise.allSettled when dealing with multiple promise
+let f = async () => {
+   const p1 = new Promise((s) => setTimeout(() => s('1'), 2000))
+   const p2 = new Promise((_,r) => setTimeout(() => r('2'), 500))   
+   const results = [await p1, await p2]  
+}
+f().catch(() => {}) 
+> Promise {<pending>}
+// error will show up after p2 is resolved, before p1 is resolved
+
+// parallel execution
+let slow = () => {
+  console.log("start slow..");
+  return new Promise(s=>{setTimeout(()=>s("slow done"),3000)});
+}
+let fast = () => {
+  console.log("start fast..");
+  return new Promise(s=>{setTimeout(()=>s("fast done"),5000)});
+}
+let parallel = async () => {
+  await Promise.all([
+      (async()=>console.log(await slow()))(),
+      (async()=>console.log(await fast()))()
+  ])
+  console.log("all done")
+}
+```
+
+# Reflection
+
+### Proxy
+
+### Reflect
+
+
+
+
+
 
 # Structured Data
-# Reflection
+
+### ArrayBuffer
+### SharedArrayBuffer 
+### Atomics 
+### DataView
+### JSON
+
 # Internationlization
 # WebAssembly
 
