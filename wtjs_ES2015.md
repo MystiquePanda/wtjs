@@ -4,10 +4,10 @@
 - [String features](#string-features)
 - [Generators](#generators)
 - [Iterators](#iterators)
-- [Math & Number feature](#math---number-feature)
+- [Math and Number feature](#math-and-number-feature)
     + [Trigonometric Methods](#trigonometric-methods)
 - [Arrow function](#arrow-function)
-- [Class & Inheritance](#class---inheritance)
+- [Class and Inheritance](#class-and-inheritance)
   * [Object member](#object-member)
   * [This and class declaration](#this-and-class-declaration)
   * [Inheritance](#inheritance)
@@ -363,7 +363,7 @@ class WeekClass {
 > (5) ["m", "t", "w", "th", "f"]
 ```
 
-## Math & Number feature
+## Math and Number feature
 
 ```js
 0xF     //#ES5
@@ -496,7 +496,7 @@ console.log((function(){}).prototype);
 > {constructor: ƒ}
 ```
 
-## Class & Inheritance
+## Class and Inheritance
 
 *a class is actually a function under the hood in JavaScript*
 *...and functions are objects*
@@ -1070,26 +1070,70 @@ let parallel = async () => {
 
 ## Proxy and Reflect
 
+### Proxy
 ```js
 let target = {
-  notProx: "original",
-  prox: "original"
+  k: "basic"
 };
 let handler = {
-  get: function(target, prop, receiver) {
-    if (prop === "prox") {
-      return "proxied";
-    }
-    return Reflect.get(...arguments);
+  get: function(target, prop) {
+    return prop in target? target[prop] : "magic"
   }
 };
 
-const proxy = new Proxy(target, handler);
-console.log([proxy.notProx,proxy.prox]);
-> [original,proxied]
+let p = new Proxy(target, handler);
+p.k = "basic"
+console.log([p.k,p.special]);
+> ["basic", "magic"]
 ```
 
+| Handler / trap | Interceptions | Invariants |
+| --- | --- | --- |
+| getPrototypeOf() | Object.getPrototypeOf(), Reflect.getPrototypeOf(),__ proto __ ,Object.prototype.isPrototypeOf(),instanceof | If target is not extensible, Object.getPrototypeOf(proxy) method must return the same value as Object.getPrototypeOf(target). | 
+| setPrototypeOf() | Object.setPrototypeOf(), Reflect.setPrototypeOf() |  |
+| isExtensible()| Object.isExtensible(), Reflect.isExtensible()	| must return the same value as Object.isExtensible(target).
+| preventExtensions() | Object.preventExtensions(), Reflect.preventExtensions() | returns true if Object.isExtensible(proxy) is false. | 
+| getOwnPropertyDescriptor() | Object.getOwnPropertyDescriptor(),Reflect.getOwnPropertyDescriptor() | must return an object or undefined | 
+| defineProperty() | Object.defineProperty(), Reflect.defineProperty() | must adhere to property's configurable policy |
+|has()	| Reflect.has() | | 
+| get()	 | Reflect.get() | behavior need to adhere to property property |
+| set()	 | | | 
+| deleteProperty() | delete proxy[prop], delete proxy.prop, Reflect.deleteProperty()| cannot delete non-configurable property | 
+| enumerate() | Reflect.enumerate() | | 
+| ownKeys() | Object.getOwnPropertyNames(), Object.getOwnPropertySymbols(), Object.keys(), Reflect.ownKeys() | | 
+| apply()|proxy(..args), Function.prototype.apply() and Function.prototype.call(), Reflect.apply() | |
+| construct() | new proxy(...args), Reflect.construct()| | 
+		
+### Reflect
+
+```js
+//ES5
+Function.prototype.apply.call(Math.floor, undefined, [1.75]);
+Reflect.apply(Math.floor, undefined, [1.75]);
+> 1
 
 
 
+
+```
+
+| Method Name | Object | Reflect|
+| --- | --- | --- | 
+| defineProperty() | returns the object that was passed to the function if successful, raise TypeError if failed to create property. | returns true if successful and false otherwise.|
+| defineProperties() | same as above | N/A |
+| set() | N/A | returns boolean based on if operation was successful. *Throws a TypeError* if the target was not an Object. |
+| get() | N/A | returns boolean based on if operation was successful. *Throws a TypeError* if the target was not an |
+| deleteProperty() | N/A | returns boolean based on if operation was successful | 
+| getOwnPropertyDescriptor() |returns a property descriptor of the given property if it exists on the object argument passed in, and returns undefined if it does not exist. However, if an object is not passed in as the first argument, it will be coerced into an object. |  returns a property descriptor of the given property if it exists on the object and undefined if it does not. *Throw a TypeError* if anything other than an object (a primitive) is passed in as the first argument.|
+|getOwnPropertyDescriptors() | returns an object containing a property descriptor of each passed-in object. Returns an empty object if the passed-in object has no owned property descriptors. | N/A | 
+| getPrototypeOf() | returns the prototype of the given object. Returns null if there are no inherited properties.  coerces non-objects | returns the prototype of the given object. Returns null if there are no inherited properties, and *throws a TypeError* for non-objects. | 
+|setPrototypeOf()| returns the object itself if its prototype was set successfully. Throws a TypeError if the prototype being set was anything other than an Object or null, or if the prototype for the object being modified is non-extensible.| returns true if the prototype was successfully set on the object and false otherwise. *Throws a TypeError* if the target passed in was not an Object, or if the prototype was anything other than an Object or null.|
+|isExtensible()|returns true if the object is extensible, and false otherwise. If the first argument is not an object (a primitive), it will be coerced into a non-extensible, ordinary object and return false.|returns true if the object is extensible, and false if it is not. *Throws a TypeError* if the first argument is not an object (a primitive).|
+| preventExtensions()	| returns the object that is being made non-extensible. If the argument is not an object (a primitive) treats the argument as a non-extensible, ordinary object and returns the object itself.|returns true if the object has been made non-extensible, false otherwise. *Throws a TypeError* if the argument is not an object (a primitive).|
+|keys() | returns an Array of strings that map to the target object's own (enumerable) property keys. If the target is not an object, coerces into objects| N/A|
+|ownKeys()| N/A | returns an Array of property names that map to the target object's own property keys. *Throws a TypeError* if the target is not an Object.|
+	
+
+
+## Modules
 
