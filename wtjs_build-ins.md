@@ -1053,11 +1053,11 @@ arr.filter( (e, i, arr) => {
 
 ```
 
-*back*: .pop() , .push()
-*front*: .shift(), .unshift()
-*by index*: .splice(pos, n)
-*shallow copy*: fruits.slice()
-*search*: .indexOf(), lastIndexOf()
+- **back**: .pop() , .push()
+- **front**: .shift(), .unshift()
+- **by index**: .splice(pos, n)
+- **shallow copy**: .slice()
+- **search**: .indexOf(), lastIndexOf()
 
 ```js
 ['a', 'b', 'c'].concat(1, [2, 3]);
@@ -1101,11 +1101,16 @@ arr[0].clone = "hi"
 - BigInt64Array, BigUint64Array
 
 ### Map
-### Set
-### WeakMap 
-### WeakSet
-*see wtjs_ES2015*
+*see [wtjs_ES2015](https://github.com/MystiquePanda/wtjs/blob/master/wtjs_ES2015.md#map)*
 
+### Set
+*see [wtjs_ES2015](https://github.com/MystiquePanda/wtjs/blob/master/wtjs_ES2015.md#set)*
+
+### WeakMap 
+*see [wtjs_ES2015](https://github.com/MystiquePanda/wtjs/blob/master/wtjs_ES2015.md#weakmap)*
+
+### WeakSet
+*see [wtjs_ES2015](https://github.com/MystiquePanda/wtjs/blob/master/wtjs_ES2015.md#weakset)*
 
 
 
