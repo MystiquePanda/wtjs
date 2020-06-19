@@ -1073,10 +1073,37 @@ let parallel = async () => {
 
 ## Proxy and Reflect
 
+### Reflect
+
+```js
+//ES5
+Function.prototype.apply.call(Math.floor, undefined, [1.75]);
+Reflect.apply(Math.floor, undefined, [1.75]);
+> 1
+```
+
+| Method Name | Object | Reflect|
+| --- | --- | --- | 
+| defineProperty() | returns the object that was passed to the function if successful, raise TypeError if failed to create property. | returns true if successful and false otherwise.|
+| defineProperties() | same as above | N/A |
+| set() | N/A | returns boolean based on if operation was successful. *Throws a TypeError* if the target was not an Object. |
+| get() | N/A | returns boolean based on if operation was successful. *Throws a TypeError* if the target was not an |
+| deleteProperty() | N/A | returns boolean based on if operation was successful | 
+| getOwnPropertyDescriptor() |returns a property descriptor of the given property if it exists on the object argument passed in, and returns undefined if it does not exist. However, if an object is not passed in as the first argument, it will be coerced into an object. |  returns a property descriptor of the given property if it exists on the object and undefined if it does not. *Throw a TypeError* if anything other than an object (a primitive) is passed in as the first argument.|
+|getOwnPropertyDescriptors() | returns an object containing a property descriptor of each passed-in object. Returns an empty object if the passed-in object has no owned property descriptors. | N/A | 
+| getPrototypeOf() | returns the prototype of the given object. Returns null if there are no inherited properties.  coerces non-objects | returns the prototype of the given object. Returns null if there are no inherited properties, and *throws a TypeError* for non-objects. | 
+|setPrototypeOf()| returns the object itself if its prototype was set successfully. Throws a TypeError if the prototype being set was anything other than an Object or null, or if the prototype for the object being modified is non-extensible.| returns true if the prototype was successfully set on the object and false otherwise. *Throws a TypeError* if the target passed in was not an Object, or if the prototype was anything other than an Object or null.|
+|isExtensible()|returns true if the object is extensible, and false otherwise. If the first argument is not an object (a primitive), it will be coerced into a non-extensible, ordinary object and return false.|returns true if the object is extensible, and false if it is not. *Throws a TypeError* if the first argument is not an object (a primitive).|
+| preventExtensions()	| returns the object that is being made non-extensible. If the argument is not an object (a primitive) treats the argument as a non-extensible, ordinary object and returns the object itself.|returns true if the object has been made non-extensible, false otherwise. *Throws a TypeError* if the argument is not an object (a primitive).|
+|keys() | returns an Array of strings that map to the target object's own (enumerable) property keys. If the target is not an object, coerces into objects| N/A|
+|ownKeys()| N/A | returns an Array of property names that map to the target object's own property keys. *Throws a TypeError* if the target is not an Object.|
+	
+	
 ### Proxy
 ```js
 let target = {
-  k: "basic"
+  k: "basic",
+  tbr: "special"
 };
 let handler = {
   get: function(target, prop) {
@@ -1085,9 +1112,17 @@ let handler = {
 };
 
 let p = new Proxy(target, handler);
-p.k = "basic"
-console.log([p.k,p.special]);
+console.log([p.k,p.new]);
 > ["basic", "magic"]
+
+let refHandler = {
+  get: function(target, prop, receiver){ 
+       return prop === "tbr" ? "replaced value": Reflect.get(...arguments)
+    }
+}
+let p = new Proxy(target, refHandler);
+console.log([p.k,p.tbr])
+> ["basic","replaced value"]
 ```
 
 | Handler / trap | Interceptions | Invariants |
@@ -1107,36 +1142,94 @@ console.log([p.k,p.special]);
 | apply()|proxy(..args), Function.prototype.apply() and Function.prototype.call(), Reflect.apply() | |
 | construct() | new proxy(...args), Reflect.construct()| | 
 		
-### Reflect
+### Static Method
 
 ```js
-//ES5
-Function.prototype.apply.call(Math.floor, undefined, [1.75]);
-Reflect.apply(Math.floor, undefined, [1.75]);
-> 1
+let revocable = Proxy.revocable(target, {
+  get: function(target, prop) {
+    return prop in target? "[[" + Reflect.get(...arguments) + "]]"  : "proxy magic" ;
+  }
+});
+console.log(revocable.proxy.nonexisting);
+> proxy magic
 
-
-
-
+revocable.revoke();
+console.log(revocable.proxy.nonexisting);
+> Uncaught TypeError: Cannot perform 'get' on a proxy that has been revoked
+proxy.foo = 1
+> Uncaught TypeError: Cannot perform 'set' on a proxy that has been revoked
+delete proxy.foo;
+> Uncaught TypeError: Cannot perform 'deleteProperty' on a proxy that has been revoked
+typeof proxy
+> "object"
 ```
 
-| Method Name | Object | Reflect|
-| --- | --- | --- | 
-| defineProperty() | returns the object that was passed to the function if successful, raise TypeError if failed to create property. | returns true if successful and false otherwise.|
-| defineProperties() | same as above | N/A |
-| set() | N/A | returns boolean based on if operation was successful. *Throws a TypeError* if the target was not an Object. |
-| get() | N/A | returns boolean based on if operation was successful. *Throws a TypeError* if the target was not an |
-| deleteProperty() | N/A | returns boolean based on if operation was successful | 
-| getOwnPropertyDescriptor() |returns a property descriptor of the given property if it exists on the object argument passed in, and returns undefined if it does not exist. However, if an object is not passed in as the first argument, it will be coerced into an object. |  returns a property descriptor of the given property if it exists on the object and undefined if it does not. *Throw a TypeError* if anything other than an object (a primitive) is passed in as the first argument.|
-|getOwnPropertyDescriptors() | returns an object containing a property descriptor of each passed-in object. Returns an empty object if the passed-in object has no owned property descriptors. | N/A | 
-| getPrototypeOf() | returns the prototype of the given object. Returns null if there are no inherited properties.  coerces non-objects | returns the prototype of the given object. Returns null if there are no inherited properties, and *throws a TypeError* for non-objects. | 
-|setPrototypeOf()| returns the object itself if its prototype was set successfully. Throws a TypeError if the prototype being set was anything other than an Object or null, or if the prototype for the object being modified is non-extensible.| returns true if the prototype was successfully set on the object and false otherwise. *Throws a TypeError* if the target passed in was not an Object, or if the prototype was anything other than an Object or null.|
-|isExtensible()|returns true if the object is extensible, and false otherwise. If the first argument is not an object (a primitive), it will be coerced into a non-extensible, ordinary object and return false.|returns true if the object is extensible, and false if it is not. *Throws a TypeError* if the first argument is not an object (a primitive).|
-| preventExtensions()	| returns the object that is being made non-extensible. If the argument is not an object (a primitive) treats the argument as a non-extensible, ordinary object and returns the object itself.|returns true if the object has been made non-extensible, false otherwise. *Throws a TypeError* if the argument is not an object (a primitive).|
-|keys() | returns an Array of strings that map to the target object's own (enumerable) property keys. If the target is not an object, coerces into objects| N/A|
-|ownKeys()| N/A | returns an Array of property names that map to the target object's own property keys. *Throws a TypeError* if the target is not an Object.|
-	
+**Use Case: Validation**
+
+```js
+let validator = {
+  set: function(obj, prop, value) {
+    if (prop === 'age') {
+      if (!Number.isInteger(value)) {
+        throw new TypeError('The age is not an integer');
+      }
+      if (value > 200) {
+        throw new RangeError('The age seems invalid');
+      }
+    }
+    obj[prop] = value;
+    return true;
+  }
+};
+
+let person = new Proxy({}, validator);
+person.age = 'young';
+> Uncaught TypeError: The age is not an integer
+person.age = 300;
+> Uncaught TypeError: The age seems invalid
+person.age = 100
+```
+other use cases:
+- Extending constructor
+- Manipulating DOM nodes
+- Value correction and an extra property
 
 
 ## Modules
 
+- You can use import and export in modules
+	- Named Exports (Zero or more exports per module)
+	- Default Exports (One per module)
+- ES6 modules are automatically strict-mode code, even if you don’t write "use strict"
+- your HTML with a <script> element of type="module",
+
+```js
+//export any top-level function, class, var, let, or const
+export function f() {}
+export class c {}
+export let v1 = …, v2 = …
+export const v1 = …, v2 = …
+export var v1 = …, v2 = …
+
+export { name1, name2, …, nameN };
+
+// Renaming exports
+export { variable1 as name1, variable2 as name2, …, nameN };
+
+// Exporting destructured assignments with renaming
+export const { name1, name2: bar } = o;
+
+// Default exports
+export default expression;
+export default function (…) { … } // also class, function*
+export default function name1(…) { … } // also class, function*
+export { name1 as default, … };
+
+// Aggregating modules
+export * from …; // does not set the default export
+export * as name1 from …; // Draft ECMAScript® 2O21
+export { name1, name2, …, nameN } from …;
+export { import1 as name1, import2 as name2, …, nameN } from …;
+export { default } from …;
+
+```
