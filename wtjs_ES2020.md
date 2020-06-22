@@ -12,3 +12,7 @@ import(modulePath)
 module = await import(modulePath)
 let { default:newFuncName } = await import(modulePath);
 ```
+
+## GlobalThis
+
+a cross platform/evironment way to access the top-most parent object
