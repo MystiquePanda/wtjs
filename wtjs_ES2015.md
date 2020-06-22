@@ -1197,11 +1197,27 @@ other use cases:
 
 ## Modules
 
-- You can use import and export in modules
+- All exported identifiers must be explicitly exported by name, can’t programmatically loop through an array and export names in a data-driven way.
 	- Named Exports (Zero or more exports per module)
 	- Default Exports (One per module)
-- ES6 modules are automatically strict-mode code, even if you don’t write "use strict"
-- your HTML with a <script> element of type="module",
+- Modules are singletons. Even if a module is imported multiple times, only a single “instance” of it exists.
+- Imports and exports must be at the top level. structure of ES6 modules is static, can't conditionally import different modules
+- Module imports are hoisted 
+- imports of a module are read-only views on the exported entities
+- default exports and unqualified named imports works in #ES2016 modules, unlike its predecessors 
+- All of a module’s dependencies are loaded, parsed, and linked eagerly, before any module code runs.
+
+
+|        | Script | Modules |
+|   ---    | --- |---- |
+|HTML element|<script>|<script type="module">|
+|Default mode|non-strict|strict|
+|Top-level variables are|global|local to module|
+|Value of this at top level|window|undefined
+|Executed|synchronously|asynchronously|
+|Declarative imports (import statement)|no|yes|
+|Programmatic imports (Promise-based API)|yes|yes|
+|File extension|.js|.js|
 
 ```js
 //export any top-level function, class, var, let, or const
@@ -1219,7 +1235,7 @@ export { variable1 as name1, variable2 as name2, …, nameN };
 // Exporting destructured assignments with renaming
 export const { name1, name2: bar } = o;
 
-// Default exports
+// Default exports - default export is just another named export
 export default expression;
 export default function (…) { … } // also class, function*
 export default function name1(…) { … } // also class, function*
@@ -1232,4 +1248,30 @@ export { name1, name2, …, nameN } from …;
 export { import1 as name1, import2 as name2, …, nameN } from …;
 export { default } from …;
 
+// Re-exporting 
+export { name1, name2 as myName2 } from 'src/other_module';
+
+// Illegal exports
+export default const variable1 = 1, variable1 = 2, variable1 = 3;
+```
+
+```js
+// Default import
+  import localName from 'src/my_lib';
+  
+// Namespace import: imports the module as an object (with one property per named export).
+  import * as my_lib from 'src/my_lib';
+  
+// Named imports:
+  import { name1, name2 } from 'src/my_lib';
+
+// Rename imports:
+  import { name1 as localName1, name2 } from 'src/my_lib';
+  import { default as foo } from 'src/my_lib';
+
+// Empty import: only loads the module, doesn’t import anything. 
+// The first import executes the body of the module.
+  import 'src/my_lib';
+  
+  
 ```
