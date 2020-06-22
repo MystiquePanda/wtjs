@@ -1250,9 +1250,6 @@ export { default } from …;
 
 // Re-exporting 
 export { name1, name2 as myName2 } from 'src/other_module';
-
-// Illegal exports
-export default const variable1 = 1, variable1 = 2, variable1 = 3;
 ```
 
 ```js
@@ -1272,6 +1269,16 @@ export default const variable1 = 1, variable1 = 2, variable1 = 3;
 // Empty import: only loads the module, doesn’t import anything. 
 // The first import executes the body of the module.
   import 'src/my_lib';
-  
-  
+ 
+```
+
+### Illegal Imports & Exports
+
+```js
+import ... from getModuleName(); // Error, only from "string" is allowed
+export default const variable1 = 1, variable1 = 2, variable1 = 3;
+
+if(...) {
+  import ...; // Error, not allowed!
+}
 ```
