@@ -1,3 +1,70 @@
+- [Value Properties](#value-properties)
+    + [infinity](#infinity)
+    + [NaN](#nan)
+    + [undefined](#undefined)
+    + [globalThis](#globalthis)
+- [Function properties](#function-properties)
+    + [eval()](#eval--)
+    + [uneval()](#uneval--)
+    + [isFinite() & Number.isFinite()](#isfinite-----numberisfinite--)
+    + [isNaN() & Number.isNaN()](#isnan-----numberisnan--)
+    + [parseFloat()](#parsefloat--)
+    + [parseInt()](#parseint--)
+    + [encodeURI()](#encodeuri--)
+    + [encodeURIComponent()](#encodeuricomponent--)
+    + [decodeURI()](#decodeuri--)
+    + [decodeURIComponent()](#decodeuricomponent--)
+- [Fundamental objects](#fundamental-objects)
+    + [Object](#object)
+      - [Creation](#creation)
+      - [Static Methods](#static-methods)
+      - [Instance properties](#instance-properties)
+      - [Instance methods (Object.prototype)](#instance-methods--objectprototype-)
+    + [Function](#function)
+      - [Instance properties](#instance-properties-1)
+      - [Instance methods (Function.prototype)](#instance-methods--functionprototype-)
+    + [Symbol](#symbol)
+      - [Static Properties & Methods](#static-properties---methods)
+      - [Instance Properties & Methods](#instance-properties---methods)
+    + [Boolean](#boolean)
+    + [Error objects](#error-objects)
+- [Numbers and dates](#numbers-and-dates)
+    + [Number](#number)
+    + [BigInt](#bigint)
+    + [Math](#math)
+    + [Date](#date)
+      - [Instance Methods](#instance-methods)
+      - [Date Parts](#date-parts)
+      - [Printing Dates](#printing-dates)
+- [Text Processing](#text-processing)
+    + [String](#string)
+    + [RegExp](#regexp)
+- [Collections](#collections)
+    + [Array](#array)
+      - [Static methods](#static-methods)
+      - [Instance Method and properties](#instance-method-and-properties)
+      - [Uniform Typed Array](#uniform-typed-array)
+    + [Map](#map)
+    + [Set](#set)
+    + [WeakMap](#weakmap)
+    + [WeakSet](#weakset)
+- [Control abstraction objects](#control-abstraction-objects)
+    + [Promise & Async](#promise---async)
+    + [Generator](#generator)
+- [Reflection](#reflection)
+- [Structured Data](#structured-data)
+    + [JSON](#json)
+    + [ArrayBuffer](#arraybuffer)
+    + [SharedArrayBuffer](#sharedarraybuffer)
+    + [Atomics](#atomics)
+    + [DataView](#dataview)
+- [Internationlization](#internationlization)
+- [WebAssembly](#webassembly)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+--------
+
 # Value Properties
 
 ### infinity
@@ -1128,11 +1195,119 @@ arr[0].clone = "hi"
 
 # Structured Data
 
+### JSON
+```js
+JSON = null
+    or true or false
+    or JSONNumber
+    or JSONString
+    or JSONObject
+    or JSONArray
+
+JSONNumber = - PositiveNumber
+          or PositiveNumber
+PositiveNumber = DecimalNumber
+              or DecimalNumber . Digits
+              or DecimalNumber . Digits ExponentPart
+              or DecimalNumber ExponentPart
+DecimalNumber = 0
+             or OneToNine Digits
+ExponentPart = e Exponent
+            or E Exponent
+Exponent = Digits
+        or + Digits
+        or - Digits
+Digits = Digit
+      or Digits Digit
+Digit = 0 through 9
+OneToNine = 1 through 9
+
+JSONString = ""
+          or " StringCharacters "
+StringCharacters = StringCharacter
+                or StringCharacters StringCharacter
+StringCharacter = any character
+                  except " or \ or U+0000 through U+001F
+               or EscapeSequence
+EscapeSequence = \" or \/ or \\ or \b or \f or \n or \r or \t
+              or \u HexDigit HexDigit HexDigit HexDigit
+HexDigit = 0 through 9
+        or A through F
+        or a through f
+
+JSONObject = { }
+          or { Members }
+Members = JSONString : JSON
+       or Members , JSONString : JSON
+
+JSONArray = [ ]
+         or [ ArrayElements ]
+ArrayElements = JSON
+             or ArrayElements , JSON
+```
+
+```js
+JSON.parse('{"p": 5}', (key, value) =>
+  typeof value === 'number'
+    ? value * 2 
+    : value
+);
+> {p:10}
+
+JSON.parse('[1, 2, 3, 4, ]');
+> Uncaught SyntaxError: Unexpected token ] in JSON 
+
+JSON.parse("{'foo': 1}");
+> Uncaught SyntaxError: Unexpected token ' in JSON
+
+JSON.stringify({ x: 5, d:new Date(), n:null, i:Infinity, f:NaN })
+> "{"x":5,"d":"2020-06-23T20:54:24.682Z","n":null,"i":null,"f":null}"
+
+let o = Object.create(null, { x: { value: 'x', enumerable: false }, y: { value: 'y', enumerable: true } })
+JSON.stringify(o);
+> "{"y":"y"}"
+
+JSON.stringify({ bigint: 5n})
+> Uncaught TypeError: Do not know how to serialize a BigInt
+
+let r = (k, v) => (typeof v === 'string' ? undefined: v);
+let dinosaur = {role: 'rulers', type:Symbol.for("dino"), numbers: 2, age: Infinity};
+JSON.stringify(dinosaur, r);
+> "{"numbers":2,"age":null}"
+
+JSON.stringify(dinosaur,["role","age"])
+> "{"role":"rulers","age":null}"
+
+JSON.stringify({ uno: 1, dos: 2 }, null, '\t');
+> "{↵	"uno": 1,↵	"dos": 2↵}"
+
+
+let o = {
+    data: 'secretes',
+    toJSON(key){
+        return  key?`Nested under key '${key}'`:this}
+};
+
+JSON.stringify(o);
+> "{"data":"secretes"}"
+
+JSON.stringify({ o }); 
+> "{"o":"Nested under key 'o'"}"
+
+JSON.stringify([ o ]);
+> "["Nested under key '0'"]"
+
+const circularReference = {};
+circularReference.myself = circularReference;
+JSON.stringify(circularReference);
+> Uncaught TypeError: Converting circular structure to JSON
+
+```
+
 ### ArrayBuffer
 ### SharedArrayBuffer 
 ### Atomics 
 ### DataView
-### JSON
 
 # Internationlization
 # WebAssembly
