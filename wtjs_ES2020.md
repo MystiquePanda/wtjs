@@ -16,3 +16,8 @@ let { default:newFuncName } = await import(modulePath);
 ## GlobalThis
 
 a cross platform/evironment way to access the top-most parent object
+
+
+## import.meta
+
+Object with null prototype that contains meta information on the module. The object is extensible, and its properties are writable, configurable, and enumerable.
