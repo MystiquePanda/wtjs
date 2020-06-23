@@ -909,10 +909,10 @@ setTimeout(
 ()=>{
   console.log("stack is empty")
   Promise.all([p1,p2,p3]).then(res =>console.log("async ", res))
-  Promise.all([]).then(res => console.log("empty itrator is sync"))
+  Promise.all([]).then(res => console.log("empty iterator is sync"))
   })
 > stack is empty
-> empty itrator is sync
+> empty iterator is sync
 > done with p3
 > async ["uno", "dos", "tres"]
 
