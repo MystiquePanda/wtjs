@@ -23,8 +23,14 @@
     + [Static methods](#static-methods)
   * [AsyncFunction](#asyncfunction)
 - [Proxy and Reflect](#proxy-and-reflect)
+  * [Reflect](#reflect)
+  * [Proxy](#proxy)
+  * [Static Method](#static-method)
+- [Modules](#modules)
+  * [Illegal Imports & Exports](#illegal-imports---exports)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 
 
@@ -1207,6 +1213,7 @@ other use cases:
 - default exports and unqualified named imports works in #ES2016 modules, unlike its predecessors 
 - All of a module’s dependencies are loaded, parsed, and linked eagerly, before any module code runs.
 
+[HTML and Java script loading](https://flaviocopes.com/javascript-async-defer/)
 
 |        | Script | Modules |
 |   ---    | --- |---- |
